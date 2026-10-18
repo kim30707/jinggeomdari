@@ -4,7 +4,7 @@
    - youtube / blog / instagram / threads: SNS 주소. 비워 두면 "개설 준비 중"
    ========================================================= */
 window.SITE_CONFIG = {
-  apiUrl: '',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbyCh_KoOwDSj9-pdtms3g2DFX83BzUfj_DmwM-bJN-w28-yI3B-LyD3yvGDL5Ase-DF6Q/exec',
   phone: '010-3837-8479',
   youtube: '',
   blog: '',
