@@ -1,0 +1,53 @@
+User-agent: Googlebot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Yeti
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Daumoa
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Bingbot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: GPTBot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: Applebot
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+User-agent: *
+Allow: /
+Disallow: /jinggeomdari/admin.html
+
+Sitemap: https://kim30707.github.io/jinggeomdari/sitemap.xml
