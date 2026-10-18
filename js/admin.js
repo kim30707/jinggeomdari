@@ -86,7 +86,7 @@
     var code = inp({ id: 'cl-code', autocomplete: 'off', required: true }), pw = inp({ type: 'password', id: 'cl-pw', autocomplete: 'new-password', required: true }), pw2 = inp({ type: 'password', id: 'cl-pw2', autocomplete: 'new-password', required: true });
     var btn = el('button', { type: 'submit', class: 'btn btn-primary', text: '비밀번호 만들고 시작하기' });
     var err = el('p', { class: 'err', role: 'alert', hidden: true });
-    var form = el('form', { class: 'login-form' }, [el('input', { type: 'text', name: 'username', value: 'admin', autocomplete: 'username', hidden: true }), field('설정 코드', code, '구글 시트 연결 때 받은 코드를 넣어 주세요.', 'code'), field('새 관리자 비밀번호 (8자 이상)', pw, null, 'password'), field('한 번 더 입력', pw2), err, btn]);
+    var form = el('form', { class: 'login-form' }, [el('input', { type: 'text', name: 'username', value: 'admin', autocomplete: 'username', hidden: true }), field('설정 코드', code, '제작자가 따로 알려 드린 코드예요 (예: JG-ABCDE-FGHIJ). 처음 한 번만 씁니다.', 'code'), field('새 관리자 비밀번호 (8자 이상)', pw, null, 'password'), field('한 번 더 입력', pw2), err, btn]);
     if (api.mode === 'preview') form.appendChild(el('p', { class: 'hint', text: '미리보기 모드 설정 코드: PREVIEW' }));
     form.addEventListener('submit', function (e) {
       e.preventDefault();
