@@ -11,7 +11,7 @@ var JG = (function () {
   var WORKS = ['심술꾼 로보와 꿀꿀이 삼총사', '은혜갚은 호랑이', '용궁으로 간 토끼', '삐뚤빼뚤의 안전일기', '꼬리뽑힌 호랑이', '팥죽할멈', '배탈난 호랑이', '안돼요 안돼! (성폭력 예방 인형극)'];
 
   var SETTINGS = [
-    ['acceptInquiries', '문의 받기', '예', '아니오로 바꾸면 홈페이지에서 날짜를 눌러도 문의를 받지 않습니다'],
+    ['acceptInquiries', '문의 받기', '예', '끄면(시트에서는 아니오) 홈페이지 달력에서 온라인 문의를 받지 않습니다'],
     ['notifyEmail', '알림 받을 이메일', '', '새 문의가 오면 이 주소로 메일을 보냅니다'],
     ['maxPerDay', '하루 최대 공연 수', '1', '이 수만큼 공연이 잡힌 날은 문의를 받지 않습니다'],
     ['openWeekdays', '문의 받는 요일', '월,화,수,목,금,토', '쉼표로 구분합니다'],
@@ -263,8 +263,8 @@ var JG = (function () {
     });
     if (!date) return fail('date', '희망 날짜를 골라 주세요.');
     var info = dayInfo(date, readEvents(env), s, env.today());
-    if (info.status !== 'open') return fail('date', '선택하신 ' + dateLabel(date) + '은(는) 문의를 받을 수 없어요. 다른 날짜를 골라 주세요.', { status: info.status });
-    if (Object.keys(errors).length) return fail('invalid', '빠진 내용이 있어요.', { errors: errors });
+    if (info.status !== 'open') return fail('date', dateLabel(date) + '에는 온라인 문의를 받을 수 없어요. 다른 날짜를 골라 주세요.', { status: info.status });
+    if (Object.keys(errors).length) return fail('invalid', '입력한 내용을 확인해 주세요.', { errors: errors });
 
     var dupKey = 'dup:' + c.phone.replace(/\D/g, '') + ':' + date;
     var dup = env.cache.get(dupKey);

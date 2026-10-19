@@ -179,7 +179,7 @@
       var cb = el('input', { type: 'checkbox', id: 'ac-agree', checked: st.agree, 'aria-describedby': 'ac-agree-err' });
       cb.addEventListener('change', function () { st.agree = cb.checked; });
       p.appendChild(el('div', { class: 'fld', 'data-key': 'agree' }, [el('label', { class: 'agree', for: 'ac-agree' }, [cb, '개인정보 수집·이용에 동의합니다 (필수)']), el('p', { class: 'err', id: 'ac-agree-err', hidden: true })]));
-      if (offline()) p.appendChild(el('p', { class: 'notice', text: '지금은 온라인 접수 연결 전이라, 버튼을 누르면 위 내용이 담긴 문자 창이 열려요.' }));
+      if (offline()) p.appendChild(el('p', { class: 'notice', text: '지금은 온라인으로 접수할 수 없어 문자로 문의를 받아요. 다음 화면에서 "문자 앱 열기"를 누르면 내용이 담긴 문자 창이 열려요.' }));
       p.appendChild(el('p', { class: 'err', id: 'ac-send-err', hidden: true, role: 'alert' }));
     }
     function keep() {

@@ -116,7 +116,7 @@
     root.textContent = '';
     var mode = api.mode === 'preview' ? el('span', { class: 'chip-mode preview', text: '미리보기 모드 · 이 컴퓨터에만 저장' }) : el('span', { class: 'chip-mode live', text: '구글 시트 연결됨' });
     var refresh = el('button', { type: 'button', class: 'ctrl', 'aria-label': '새로고침' }, [icon('ph-arrow-clockwise')]);
-    refresh.addEventListener('click', function () { load().then(function () { toast('새로 불러왔어요.'); }); });
+    refresh.addEventListener('click', function () { load().then(function () { if (root.querySelector('.adm-top')) toast('새로 불러왔어요.'); }); });
     var out = el('button', { type: 'button', class: 'btn btn-ghost sm', text: '로그아웃' });
     out.addEventListener('click', function () { call('logout'); tokenSet(null); S.data = null; login(); });
     var newCount = S.data.inquiries.filter(function (q) { return q.status === '새 문의'; }).length;
@@ -151,7 +151,7 @@
     main.appendChild(bar);
     var list = all.filter(function (q) { return S.filter === '전체' || q.status === S.filter; });
     if (!list.length) {
-      main.appendChild(el('div', { class: 'empty big' }, [el('b', { text: S.filter === '전체' ? '아직 들어온 문의가 없어요.' : S.filter + ' 상태인 문의가 없어요.' }), el('span', { text: '홈페이지 공연 일정 달력에서 초록색 날짜를 누르면 문의가 이곳에 쌓입니다.' })]));
+      main.appendChild(el('div', { class: 'empty big' }, [el('b', { text: S.filter === '전체' ? '아직 들어온 문의가 없어요.' : S.filter + ' 상태인 문의가 없어요.' }), el('span', { text: '고객이 홈페이지 달력에서 날짜를 고르고 문의를 보내면 이곳에 쌓입니다.' })]));
       return;
     }
     main.appendChild(el('div', { class: 'inq-list' }, list.map(inquiryCard)));
@@ -195,13 +195,13 @@
       var done = busy(b, '삭제 중...');
       call('deleteInquiry', { id: q.id }).then(function (r) { done(); if (r.ok) { toast('삭제했어요.'); delete S.open[q.id]; load(); } else toast(r.message || '삭제하지 못했어요.', true); });
     }, 'btn-ghost sm'));
-    card.appendChild(el('div', { class: 'inq-body' }, [dl, el('div', { class: 'inq-edit' }, [field('상태', status), field('관리자 메모', memo, '고객에게는 보이지 않아요.'), el('div', { class: 'row-btns' }, actions)])]));
+    card.appendChild(el('div', { class: 'inq-body' }, [dl, el('div', { class: 'inq-edit' }, [field('상태', status, '문의 상태만 바뀌어요. 등록된 공연은 공연 일정에서 고치거나 지워 주세요.'), field('관리자 메모', memo, '고객에게는 보이지 않아요.'), el('div', { class: 'row-btns' }, actions)])]));
     return card;
   }
 
   /* ---------- 공연 일정 ---------- */
   function tabCalendar(main) {
-    main.appendChild(el('div', { class: 'adm-head' }, [el('h1', { text: '공연 일정' }), el('p', { class: 'lead', text: '날짜를 누르면 그 날 일정을 추가할 수 있어요. 공연이 있는 날과 불가로 막은 날은 홈페이지 달력에서 문의를 받지 않습니다.' })]));
+    main.appendChild(el('div', { class: 'adm-head' }, [el('h1', { text: '공연 일정' }), el('p', { class: 'lead', text: '날짜를 누르면 그날 일정을 추가할 수 있어요. 하루 최대 공연 수만큼 공연이 잡힌 날과 불가로 막은 날은 홈페이지 달력에서 문의를 받지 않습니다.' })]));
     var grid = el('div', { class: 'cal-admin' });
     main.appendChild(grid);
     var left = el('div', { class: 'cal' }), right = el('div', { class: 'ev-side' });
@@ -264,7 +264,7 @@
     var place = inp({ id: 'ev-place', placeholder: '예: ○○ 직장어린이집', maxlength: 80 }, e.place);
     var region = inp({ id: 'ev-region', placeholder: '예: 해운대구', maxlength: 40 }, e.region);
     var visBox = el('div', { class: 'vis' }, JG.VIS.map(function (v) {
-      var help = { '공개': '홈페이지에 작품·기관·지역이 보여요', '기관 숨김': '작품과 지역만 보이고 기관 이름은 숨겨요', '예약됨만': '"예약된 공연"으로만 보여요' }[v];
+      var help = { '공개': '홈페이지에 작품과 기관 이름(없으면 지역)이 보여요', '기관 숨김': '작품과 지역만 보이고 기관 이름은 숨겨요', '예약됨만': '"예약된 공연"으로만 보여요' }[v];
       return el('label', { class: 'vis-opt' }, [el('input', { type: 'radio', name: 'ev-vis', value: v, checked: e.visibility === v }), el('span', null, [el('b', { text: v }), el('small', { text: help })])]);
     }));
     var memo = inp({ tag: 'textarea', id: 'ev-memo', maxlength: 500, placeholder: '담당자 연락처, 준비물 등 (홈페이지에 안 보여요)' }, e.memo);
@@ -298,7 +298,7 @@
   function monthList(box) {
     var m = S.month, list = S.data.events.filter(function (e) { return e.date.slice(0, 7) === m.slice(0, 7); });
     var wrap = el('section', { class: 'ev-list' }, [el('h2', { text: (+m.slice(5, 7)) + '월 일정 ' + list.length + '건' })]);
-    if (!list.length) wrap.appendChild(el('p', { class: 'empty', text: '이 달에는 등록된 일정이 없어요. 달력에서 날짜를 눌러 추가해 보세요.' }));
+    if (!list.length) wrap.appendChild(el('p', { class: 'empty', text: '이달에는 등록된 일정이 없어요. 달력에서 날짜를 눌러 추가해 보세요.' }));
     list.forEach(function (e) {
       var b = el('button', { type: 'button', class: 'ev-row' + (S.edit && S.edit.id === e.id ? ' on' : '') }, [
         el('span', { class: 'inq-date' }, [el('b', { text: mmdd(e.date) }), JG.weekday(e.date)]),
@@ -369,7 +369,7 @@
       var done = busy(save);
       call('saveQuestions', { questions: S.draft }).then(function (r) {
         done();
-        if (r.ok) { S.dirty = false; S.draft = null; toast('질문을 저장했어요. 홈페이지 문의 창에 바로 반영돼요.'); load(); return; }
+        if (r.ok) { S.dirty = false; S.draft = null; toast('질문을 저장했어요. 홈페이지를 새로 열면 바뀐 질문이 보여요.'); load(); return; }
         if (r.errors) Object.keys(r.errors).forEach(function (k) { var c = list.querySelector('[data-key="' + k + '"]'); if (c) { c.classList.add('bad'); var p = c.querySelector(':scope > .err'); p.hidden = false; p.textContent = r.errors[k]; } });
         toast(r.message || '저장하지 못했어요.', true);
         var first = list.querySelector('.q-card.bad'); if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
