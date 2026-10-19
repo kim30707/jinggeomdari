@@ -1,7 +1,8 @@
 /* 관리자 화면: 매일 쓰는 업무 화면이라 움직임은 반응(눌림·저장 표시)만 둡니다 */
 .adm { background: var(--bg); }
 .adm-loading { padding: 40px 20px; text-align: center; color: var(--ink-soft); }
-.adm-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 20px; white-space: nowrap; }
+.adm-brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 23px; white-space: nowrap; }
+.adm-brand .adm-tag { font-family: var(--body); font-size: 12px; font-weight: 700; color: var(--leaf); background: var(--tint-2); border-radius: var(--pill); padding: 2px 9px; align-self: center; }
 .login-wrap { min-height: 100dvh; display: grid; place-items: center; padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .login-card { width: min(460px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: grid; gap: 16px; box-shadow: var(--shadow); }
 .login-card h1 { font-size: 28px; }

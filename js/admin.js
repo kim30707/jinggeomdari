@@ -50,7 +50,7 @@
       el('a', { class: 'btn btn-ghost', href: 'index.html', text: '홈페이지로 돌아가기' })
     ])]));
   }
-  function brand() { return el('div', { class: 'adm-brand' }, [el('span', { class: 'stones-mark', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]), '아동극단 징검다리 관리자']); }
+  function brand() { return el('div', { class: 'adm-brand' }, [el('span', { class: 'stones-mark', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]), el('span', { class: 'bn' }, [el('small', { text: '아동극단 ' }), el('span', { text: '징검다리' })]), el('small', { class: 'adm-tag', text: '관리자' })]); }
   function login(msg) {
     root.textContent = '';
     var card = el('div', { class: 'login-card' }, [brand(), el('p', { class: 'lead', text: '연결 상태를 확인하는 중...' })]);
