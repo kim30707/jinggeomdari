@@ -49,4 +49,4 @@
 - [처음 화면과 공연 일정 달력](https://kim30707.github.io/jinggeomdari/)
 - [자주 묻는 질문](https://kim30707.github.io/jinggeomdari/faq.html)
 
-최종 업데이트: 2026-10-19
+최종 업데이트: 2026-10-20
