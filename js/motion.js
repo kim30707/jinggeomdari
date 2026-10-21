@@ -59,8 +59,12 @@
   var box = document.querySelector('.lightbox');
   if (box && typeof box.showModal === 'function') {
     var img = box.querySelector('img'), cap = box.querySelector('p');
-    document.querySelectorAll('[data-full]').forEach(function (b) {
-      b.addEventListener('click', function () { img.src = b.dataset.full; img.alt = b.dataset.caption || ''; cap.textContent = b.dataset.caption || ''; box.showModal(); });
+    img.addEventListener('error', function () { if (/-1600\.webp$/.test(img.src)) img.src = img.src.replace(/-1600\.webp$/, '-800.webp'); });
+    // 나중에 그려지는 사진(관리자가 고친 작품 사진)도 열리도록 한 곳에서 받습니다
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-full]');
+      if (!b) return;
+      img.src = b.dataset.full; img.alt = b.dataset.caption || ''; cap.textContent = b.dataset.caption || ''; box.showModal();
     });
     box.querySelector('.close').addEventListener('click', function () { box.close(); });
     box.addEventListener('click', function (e) { if (e.target === box) box.close(); });

@@ -1,11 +1,11 @@
-/* 아동극단 징검다리 관리자 화면: 문의 내역 · 공연 일정 · 문의 질문 · 설정 */
+/* 아동극단 징검다리 관리자 화면: 문의 내역 · 공연 일정 · 작품·사진 · 문의 질문 · 설정 */
 (function () {
   'use strict';
   var root = document.getElementById('admin-root');
   var el = JGForm.el, api = JGApi;
   var TOKEN_KEY = 'jg-admin-token';
-  var S = { token: null, data: null, tab: 'inq', filter: '새 문의', month: null, edit: null, open: {}, draft: null, dirty: false };
-  var TABS = [['inq', '문의 내역', 'ph-tray'], ['cal', '공연 일정', 'ph-calendar-blank'], ['q', '문의 질문', 'ph-list-checks'], ['set', '설정', 'ph-gear-six']];
+  var S = { token: null, data: null, tab: 'inq', filter: '새 문의', month: null, edit: null, open: {}, draft: null, dirty: false, wedit: null, wdraft: null, wdirty: false };
+  var TABS = [['inq', '문의 내역', 'ph-tray'], ['cal', '공연 일정', 'ph-calendar-blank'], ['w', '작품·사진', 'ph-images'], ['q', '문의 질문', 'ph-list-checks'], ['set', '설정', 'ph-gear-six']];
 
   function icon(n) { return el('i', { class: 'ph ' + n, 'aria-hidden': 'true' }); }
   function tokenGet() { try { return sessionStorage.getItem(TOKEN_KEY); } catch (e) { return S.token; } }
@@ -124,6 +124,7 @@
       var b = el('button', { type: 'button', role: 'tab', class: 'adm-tab', 'aria-selected': String(S.tab === t[0]), id: 'tab-' + t[0] }, [icon(t[2]), t[1], t[0] === 'inq' && newCount ? el('span', { class: 'count', text: String(newCount) }) : null]);
       b.addEventListener('click', function () {
         if (S.tab === 'q' && S.dirty && t[0] !== 'q') toast('문의 질문에 저장하지 않은 변경이 있어요.', true);
+        if (S.tab === 'w' && S.wdirty && t[0] !== 'w') toast('작품·사진에 저장하지 않은 변경이 있어요.', true);
         S.tab = t[0]; shell();
       });
       return b;
@@ -133,7 +134,7 @@
       el('header', { class: 'adm-top' }, [brand(), mode, el('div', { class: 'adm-actions' }, [el('a', { class: 'btn btn-ghost sm', href: 'index.html#schedule', target: '_blank', rel: 'noopener', text: '홈페이지 보기' }), refresh, out])]),
       tabs, main
     ]));
-    ({ inq: tabInquiries, cal: tabCalendar, q: tabQuestions, set: tabSettings })[S.tab](main);
+    ({ inq: tabInquiries, cal: tabCalendar, w: tabWorks, q: tabQuestions, set: tabSettings })[S.tab](main);
   }
 
   /* ---------- 문의 내역 ---------- */
@@ -308,6 +309,199 @@
       wrap.appendChild(b);
     });
     box.appendChild(wrap);
+  }
+
+  /* ---------- 작품·사진 ---------- */
+  var ART_NAMES = { '': '사진으로 보이기', 'art-sun': '노란 색 카드', 'art-sky': '하늘색 카드', 'art-leaf': '초록 색 카드' };
+  function thumbSrc(src) { return JG.photoUrl(src, 800, ''); }
+  function workPhotos(id) { return S.data.photos.filter(function (p) { return p.workId === id; }); }
+  function tabWorks(main) {
+    if (S.wedit) { workEditor(main); return; }
+    var works = S.data.workList || [];
+    main.appendChild(el('div', { class: 'adm-head' }, [el('h1', { text: '작품·사진' }), el('p', { class: 'lead', text: '홈페이지의 공연 작품과 사진을 고칩니다. 작품을 눌러 설명을 고치고 사진을 올리거나 지울 수 있어요. 저장하면 홈페이지에 바로 반영돼요.' })]));
+    var add = el('button', { type: 'button', class: 'btn btn-primary' }, [icon('ph-plus'), '새 작품 추가']);
+    add.addEventListener('click', function () { S.wedit = 'new'; S.wdraft = null; S.wdirty = false; shell(); });
+    main.appendChild(el('div', { class: 'wk-tools' }, [add, el('p', { class: 'help', text: '화살표로 홈페이지에 보이는 순서를 바꿔요. 바꾸면 바로 저장돼요.' })]));
+    var list = el('ul', { class: 'wk-list' });
+    works.forEach(function (w, i) {
+      var ph = workPhotos(w.id);
+      var thumb = ph.length && !w.art ? el('img', { src: thumbSrc(ph[0].src), alt: '', loading: 'lazy' }) : el('span', { class: 'wk-art ' + (w.art || JG.ARTS[i % JG.ARTS.length]), text: w.title.slice(0, 2) });
+      var tags = [w.badge ? el('span', { class: 'pill st-0', text: w.badge }) : null, w.featured ? el('span', { class: 'pill st-2', text: '첫 화면 크게' }) : null, !w.active ? el('span', { class: 'pill st-3', text: '홈페이지에 숨김' }) : null];
+      var up = el('button', { type: 'button', class: 'ctrl sm', 'aria-label': w.title + ' 위로', disabled: i === 0 }, [icon('ph-arrow-up')]);
+      var down = el('button', { type: 'button', class: 'ctrl sm', 'aria-label': w.title + ' 아래로', disabled: i === works.length - 1 }, [icon('ph-arrow-down')]);
+      function move(d) {
+        var ids = works.map(function (x) { return x.id; }), j = i + d, t = ids[j]; ids[j] = ids[i]; ids[i] = t;
+        call('orderWorks', { ids: ids }).then(function (r) { if (r.ok) { S.data.workList = r.works; toast('순서를 바꿨어요.'); shell(); } else toast(r.message || '바꾸지 못했어요.', true); });
+      }
+      up.addEventListener('click', function () { move(-1); });
+      down.addEventListener('click', function () { move(1); });
+      var open = el('button', { type: 'button', class: 'wk-open' }, [el('span', { class: 'wk-thumb' }, [thumb]), el('span', { class: 'wk-info' }, [el('b', { text: w.title + (w.sub ? ' (' + w.sub + ')' : '') }), el('small', { text: '사진 ' + ph.length + '장 · ' + (w.line || '') }), el('span', { class: 'wk-tags' }, tags)])]);
+      open.addEventListener('click', function () { S.wedit = w.id; S.wdraft = null; S.wdirty = false; shell(); });
+      list.appendChild(el('li', { class: 'wk-row' + (w.active ? '' : ' off') }, [open, el('span', { class: 'wk-move' }, [up, down])]));
+    });
+    var common = workPhotos('');
+    var gen = el('button', { type: 'button', class: 'wk-open' }, [el('span', { class: 'wk-thumb' }, [common.length ? el('img', { src: thumbSrc(common[0].src), alt: '', loading: 'lazy' }) : el('span', { class: 'wk-art art-sky', text: '사진' })]),
+      el('span', { class: 'wk-info' }, [el('b', { text: '공통 사진' }), el('small', { text: '작품과 상관없는 사진 ' + common.length + '장 · 첫 화면 "공연 사진"에만 보여요' })])]);
+    gen.addEventListener('click', function () { S.wedit = '_common'; S.wdraft = null; S.wdirty = false; shell(); });
+    list.appendChild(el('li', { class: 'wk-row common' }, [gen]));
+    main.appendChild(list);
+  }
+
+  function shrink(file) {
+    var max = api.mode === 'preview' ? 1000 : 2000, q = api.mode === 'preview' ? 0.7 : 0.85;
+    return new Promise(function (res, rej) {
+      var u = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+        var c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * s); c.height = Math.round(im.naturalHeight * s);
+        var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', q));
+      };
+      im.onerror = function () { URL.revokeObjectURL(u); rej(new Error('read')); };
+      im.src = u;
+    });
+  }
+
+  function workEditor(main) {
+    var common = S.wedit === '_common', isNew = S.wedit === 'new';
+    var wid = common ? '' : (isNew ? null : S.wedit);
+    var base = common || isNew ? null : (S.data.workList || []).filter(function (w) { return w.id === wid; })[0];
+    if (!common && !isNew && !base) { S.wedit = null; S.wdraft = null; shell(); return; }
+    if (!S.wdraft || S.wdraft._for !== S.wedit) {
+      var w0 = base || { id: '', title: '', badge: '', sub: '', genre: [], time: '40분', line: '', story: [], points: [], theme: '', note: '', art: '', featured: false, active: true };
+      S.wdraft = { _for: S.wedit, work: JSON.parse(JSON.stringify(w0)), photos: common || !isNew ? workPhotos(wid).map(function (p) { return { id: p.id, caption: p.caption, home: p.home, src: p.src }; }) : [] };
+      S.wdirty = false;
+    }
+    var D = S.wdraft, W = D.work;
+    function mark() { S.wdirty = true; saveBar.classList.add('dirty'); status.textContent = '저장하지 않은 변경이 있어요'; }
+    function leave() { S.wedit = null; S.wdraft = null; S.wdirty = false; shell(); }
+    var back = S.wdirty ? confirmBtn('← 작품 목록', '저장하지 않고 나가기', leave, 'btn-ghost sm') : el('button', { type: 'button', class: 'btn btn-ghost sm', text: '← 작품 목록' });
+    if (!S.wdirty) back.addEventListener('click', leave);
+    var title = common ? '공통 사진' : (isNew ? '새 작품 만들기' : W.title);
+    var view = !common && !isNew ? el('a', { class: 'btn btn-ghost sm', href: 'works/view.html?w=' + encodeURIComponent(wid), target: '_blank', rel: 'noopener' }, [icon('ph-arrow-square-out'), '홈페이지에서 보기']) : null;
+    main.appendChild(el('div', { class: 'wk-bar' }, [back, view]));
+    main.appendChild(el('div', { class: 'adm-head' }, [el('h1', { text: title }), el('p', { class: 'lead', text: common ? '작품과 상관없는 사진입니다. "홈 사진 모음"을 켠 사진이 첫 화면 공연 사진에 보여요.' : (isNew ? '작품 설명을 적고 저장하면 사진을 올릴 수 있어요.' : '설명을 고치고 사진을 올리거나 지운 뒤 아래 저장을 눌러 주세요.') })]));
+    var grid = el('div', { class: 'wk-grid' });
+    main.appendChild(grid);
+
+    /* 작품 설명 */
+    var fields = {};
+    if (!common) {
+      var form = el('section', { class: 'set-card wk-form' }, [el('h2', { text: '작품 설명' })]);
+      function text(key, label, help, attrs, toVal, fromVal) {
+        var v = fromVal ? fromVal(W[key]) : W[key];
+        var i = inp(Object.assign({ id: 'wk-' + key }, attrs || {}), v);
+        i.addEventListener('input', function () { W[key] = toVal ? toVal(i.value) : i.value; mark(); });
+        var f = field(label, i, help, key);
+        fields[key] = f;
+        form.appendChild(f);
+        return i;
+      }
+      text('title', '제목 *', '', { maxlength: 80 });
+      text('sub', '부제 (선택)', '예: 성폭력 예방 인형극', { maxlength: 40 });
+      text('badge', '표시 (선택)', '작품 카드 왼쪽 위에 붙어요. 예: 2026 신작 · 신작이 아니면 비워 두세요. "신작"이 들어간 작품은 다시 만들 때 첫 화면 큰 사진에도 나와요.', { maxlength: 30 });
+      text('genre', '장르', '쉼표로 나눠 적어요. 예: 캐릭터 인형극, 막대 인형극', { maxlength: 100 }, function (v) { return v.split(',').map(function (x) { return x.trim(); }).filter(Boolean); }, function (v) { return (v || []).join(', '); });
+      text('time', '공연 시간', '예: 40분', { maxlength: 20 });
+      text('line', '한 줄 소개 *', '작품 카드와 검색 결과에 보이는 한 문장이에요.', { maxlength: 160 });
+      text('story', '줄거리', '문단 사이에 빈 줄을 하나 넣어 주세요.', { tag: 'textarea', rows: 10 }, function (v) { return v.split(/\n\s*\n/).map(function (x) { return x.trim(); }).filter(Boolean); }, function (v) { return (v || []).join('\n\n'); });
+      text('points', '아이들과 나누는 이야기', '한 줄에 하나씩, 3개 정도 적어요.', { tag: 'textarea', rows: 4 }, function (v) { return v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }, function (v) { return (v || []).join('\n'); });
+      text('theme', '주제', '예: 함께 힘을 모으는 용기', { maxlength: 80 });
+      text('note', '덧붙이는 말 (선택)', '"아이들과 나누는 이야기" 아래 작게 보여요.', { maxlength: 300 });
+      var art = el('select', { class: 'inp', id: 'wk-art' }, Object.keys(ART_NAMES).map(function (k) { var o = el('option', { value: k, text: ART_NAMES[k] }); if ((W.art || '') === k) o.selected = true; return o; }));
+      art.addEventListener('change', function () { W.art = art.value; mark(); });
+      form.appendChild(field('작품 카드 모양', art, '사진이 없으면 색 카드로 보여요.'));
+      var feat = el('input', { type: 'checkbox', id: 'wk-feat', checked: !!W.featured });
+      feat.addEventListener('change', function () { W.featured = feat.checked; mark(); });
+      var act = el('input', { type: 'checkbox', id: 'wk-act', checked: W.active !== false });
+      act.addEventListener('change', function () { W.active = act.checked; mark(); });
+      form.appendChild(el('div', { class: 'q-row' }, [el('label', { class: 'switch', for: 'wk-feat' }, [feat, '첫 화면에서 크게 (한 작품만)']), el('label', { class: 'switch', for: 'wk-act' }, [act, '홈페이지에 보이기'])]));
+      grid.appendChild(form);
+    }
+
+    /* 사진 */
+    var pics = el('section', { class: 'set-card wk-photos' }, [el('h2', { text: '사진' }), el('p', { class: 'help', text: common ? '화살표로 순서를 바꿔요.' : '맨 앞 사진이 대표 사진이에요(작품 카드와 작품 페이지 맨 위). 화살표로 순서를 바꾸고, "홈 사진 모음"을 켜면 첫 화면 공연 사진에도 보여요.' })]);
+    var file = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/*', multiple: true, id: 'wk-file', class: 'sr-only' });
+    var upBtn = el('label', { class: 'btn btn-soft' + (isNew ? ' disabled' : ''), for: 'wk-file' }, [icon('ph-upload-simple'), '사진 올리기']);
+    var prog = el('p', { class: 'help wk-prog', hidden: true, 'aria-live': 'polite' });
+    if (isNew) { file.disabled = true; pics.appendChild(el('p', { class: 'hint', text: '작품을 먼저 저장하면 사진을 올릴 수 있어요.' })); }
+    else pics.append(el('div', { class: 'wk-up' }, [upBtn, file, el('span', { class: 'help', text: '휴대폰 사진도 돼요. 크기는 알맞게 줄여서 올라가요.' })]), prog);
+    var box = el('div', { class: 'ph-grid' });
+    pics.appendChild(box);
+    grid.appendChild(pics);
+    function drawPhotos() {
+      box.textContent = '';
+      if (!D.photos.length) { box.appendChild(el('p', { class: 'empty', text: isNew ? '아직 사진이 없어요.' : '아직 사진이 없어요. "사진 올리기"를 눌러 주세요.' })); return; }
+      D.photos.forEach(function (p, i) {
+        var cap = inp({ id: 'ph-cap-' + i, maxlength: 120, placeholder: '사진 설명 (예: 무대 위 꿀꿀이 삼총사)' }, p.caption);
+        cap.addEventListener('input', function () { p.caption = cap.value; mark(); });
+        var home = el('input', { type: 'checkbox', id: 'ph-home-' + i, checked: !!p.home });
+        home.addEventListener('change', function () { p.home = home.checked; mark(); });
+        var left = el('button', { type: 'button', class: 'ctrl sm', 'aria-label': (i + 1) + '번 사진 앞으로', disabled: i === 0 }, [icon('ph-arrow-left')]);
+        var right = el('button', { type: 'button', class: 'ctrl sm', 'aria-label': (i + 1) + '번 사진 뒤로', disabled: i === D.photos.length - 1 }, [icon('ph-arrow-right')]);
+        left.addEventListener('click', function () { D.photos.splice(i - 1, 0, D.photos.splice(i, 1)[0]); mark(); drawPhotos(); });
+        right.addEventListener('click', function () { D.photos.splice(i + 1, 0, D.photos.splice(i, 1)[0]); mark(); drawPhotos(); });
+        var del = confirmBtn('삭제', '한 번 더 누르면 삭제', function () { D.photos.splice(i, 1); mark(); drawPhotos(); toast('저장을 누르면 사진이 지워져요.'); }, 'btn-ghost sm');
+        box.appendChild(el('figure', { class: 'ph-card' }, [
+          el('div', { class: 'ph-img' }, [el('img', { src: thumbSrc(p.src), alt: p.caption || '', loading: 'lazy' }), i === 0 && !common ? el('span', { class: 'ph-cover', text: '대표 사진' }) : null]),
+          cap,
+          el('div', { class: 'ph-row' }, [left, right, el('label', { class: 'switch', for: 'ph-home-' + i }, [home, '홈 사진 모음']), del])
+        ]));
+      });
+    }
+    file.addEventListener('change', function () {
+      var files = Array.prototype.slice.call(file.files || []); file.value = '';
+      if (!files.length) return;
+      var i = 0, okCount = 0;
+      prog.hidden = false; upBtn.classList.add('disabled'); file.disabled = true;
+      (function next() {
+        if (i >= files.length) {
+          prog.textContent = okCount ? okCount + '장 올렸어요. 설명을 적고 저장을 눌러 주세요.' : '';
+          upBtn.classList.remove('disabled'); file.disabled = false;
+          if (okCount) toast(okCount + '장 올렸어요. 홈페이지에도 바로 보여요.');
+          return;
+        }
+        var f = files[i++];
+        prog.textContent = '사진 올리는 중 (' + i + '/' + files.length + ') ...';
+        shrink(f).then(function (data) {
+          return call('addPhoto', { workId: wid, data: data.split(',')[1], mime: 'image/jpeg', caption: '' });
+        }).then(function (r) {
+          if (r.ok) { okCount++; S.data.photos.push(r.photo); D.photos.push({ id: r.photo.id, caption: r.photo.caption, home: r.photo.home, src: r.photo.src }); drawPhotos(); }
+          else toast(r.message || '사진을 올리지 못했어요.', true);
+          next();
+        }, function () { toast(f.name + ' 은(는) 열 수 없는 사진이에요. JPG나 PNG로 해 주세요.', true); next(); });
+      })();
+    });
+    drawPhotos();
+
+    /* 저장 */
+    var status = el('span', { class: 'save-status', text: S.wdirty ? '저장하지 않은 변경이 있어요' : '저장된 상태예요' });
+    var save = el('button', { type: 'button', class: 'btn btn-primary', text: common ? '사진 저장' : '저장' });
+    var revert = el('button', { type: 'button', class: 'btn btn-ghost', text: '변경 취소' });
+    revert.addEventListener('click', function () { S.wdraft = null; S.wdirty = false; shell(); });
+    var btns = [revert, save];
+    if (!common && !isNew) btns.unshift(confirmBtn('작품 삭제', '사진까지 지워요. 한 번 더 누르면 삭제', function (b) {
+      var done = busy(b, '삭제 중...');
+      call('deleteWork', { id: wid }).then(function (r) { done(); if (r.ok) { toast('작품을 지웠어요.'); leave(); load(); } else toast(r.message || '지우지 못했어요.', true); });
+    }));
+    var saveBar = el('div', { class: 'save-bar' + (S.wdirty ? ' dirty' : '') }, [status, el('div', { class: 'row-btns' }, btns)]);
+    save.addEventListener('click', function () {
+      Object.keys(fields).forEach(function (k) { var f = fields[k]; f.classList.remove('bad'); var p = f.querySelector('.err'); if (p) p.hidden = true; });
+      var done = busy(save);
+      var photos = D.photos.map(function (p) { return { id: p.id, caption: p.caption, home: p.home }; });
+      var req = common ? call('savePhotos', { workId: '', photos: photos }) : call('saveWork', { work: W, photos: isNew ? null : photos });
+      req.then(function (r) {
+        done();
+        if (r.ok) {
+          S.wdirty = false; S.wdraft = null;
+          if (isNew && r.work) { S.wedit = r.work.id; toast('작품을 만들었어요. 이제 사진을 올려 주세요.'); }
+          else toast('저장했어요. 홈페이지에 바로 반영돼요.');
+          load(); return;
+        }
+        if (r.errors) Object.keys(r.errors).forEach(function (k) { var f = fields[k]; if (!f) return; f.classList.add('bad'); var p = f.querySelector('.err'); p.hidden = false; p.textContent = r.errors[k]; });
+        toast(r.message || '저장하지 못했어요.', true);
+      });
+    });
+    main.appendChild(saveBar);
   }
 
   /* ---------- 문의 질문 ---------- */

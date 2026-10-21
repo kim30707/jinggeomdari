@@ -1,4 +1,4 @@
-/* 아동극단 징검다리 · 공연 일정과 문의 공통 규칙
+/* 아동극단 징검다리 · 공연 일정·문의·작품·사진 공통 규칙
    홈페이지(미리보기)와 구글 Apps Script 서버가 똑같은 이 코드를 씁니다. */
 var JG = (function () {
   'use strict';
@@ -8,6 +8,7 @@ var JG = (function () {
   var STATUSES = ['새 문의', '연락함', '확정', '불가·취소'];
   var KINDS = ['공연', '불가'];
   var VIS = ['공개', '기관 숨김', '예약됨만'];
+  var ARTS = ['art-sun', 'art-sky', 'art-leaf'];
   var WORKS = ['심술꾼 로보와 꿀꿀이 삼총사', '은혜갚은 호랑이', '용궁으로 간 토끼', '삐뚤빼뚤의 안전일기', '꼬리뽑힌 호랑이', '팥죽할멈', '배탈난 호랑이', '안돼요 안돼! (성폭력 예방 인형극)'];
 
   var SETTINGS = [
@@ -39,8 +40,11 @@ var JG = (function () {
     events: { sheet: '공연일정', cols: [['id', '번호'], ['date', '날짜'], ['time', '시간'], ['kind', '종류'], ['title', '작품'], ['place', '기관·장소'], ['region', '지역'], ['visibility', '공개 방식'], ['memo', '관리자 메모'], ['createdAt', '등록일시']] },
     inquiries: { sheet: '문의', cols: [['id', '번호'], ['createdAt', '접수일시'], ['date', '희망 날짜'], ['org', '기관명'], ['name', '담당자'], ['phone', '연락처'], ['status', '상태'], ['memo', '관리자 메모'], ['summary', '문의 내용'], ['eventId', '연결된 일정'], ['answers', '답변 원본(고치지 마세요)']] },
     questions: { sheet: '문의 질문', cols: [['id', '번호'], ['order', '순서'], ['label', '질문'], ['type', '유형'], ['options', '선택지(줄마다 하나)'], ['required', '필수'], ['help', '도움말'], ['active', '사용']] },
-    settings: { sheet: '설정', cols: [['key', '항목'], ['label', '설명'], ['value', '값']] }
+    settings: { sheet: '설정', cols: [['key', '항목'], ['label', '설명'], ['value', '값']] },
+    works: { sheet: '작품', cols: [['id', '번호'], ['order', '순서'], ['title', '제목'], ['badge', '표시(예: 2026 신작)'], ['sub', '부제'], ['genre', '장르(쉼표로 나눔)'], ['time', '공연 시간'], ['line', '한 줄 소개'], ['story', '줄거리(빈 줄로 문단 나눔)'], ['points', '아이들과 나누는 이야기(줄마다)'], ['theme', '주제'], ['note', '덧붙이는 말'], ['art', '사진 없을 때 색'], ['featured', '크게 보이기'], ['active', '공개'], ['updatedAt', '고친 날']] },
+    photos: { sheet: '사진', cols: [['id', '번호'], ['workId', '작품 번호'], ['order', '순서'], ['caption', '사진 설명'], ['src', '사진 위치(고치지 마세요)'], ['home', '홈 사진 모음'], ['createdAt', '등록일시']] }
   };
+  var MAX_PHOTOS = 30, MAX_WORKS = 30;
 
   /* ---------- 작은 도구 ---------- */
   function str(v) { return v == null ? '' : String(v); }
@@ -102,6 +106,33 @@ var JG = (function () {
     SCHEMA.inquiries.cols.forEach(function (c) { o[c[0]] = c[0] === 'answers' ? JSON.stringify(q.answers || []) : str(q[c[0]]); });
     return o;
   }
+  function lines(v, max, n) { return str(v).split('\n').map(function (x) { return clean(x, max); }).filter(Boolean).slice(0, n || 20); }
+  function paras(v) { return str(v).replace(/\r\n?/g, '\n').split(/\n\s*\n/).map(function (x) { return clean(x.replace(/\s*\n\s*/g, ' '), 1500); }).filter(Boolean).slice(0, 12); }
+  function toWork(r) {
+    return {
+      id: str(r.id).trim(), order: +r.order || 0, title: clean(r.title, 80), badge: clean(r.badge, 30), sub: clean(r.sub, 40),
+      genre: (Array.isArray(r.genre) ? r.genre : str(r.genre).split(/[,\n]/)).map(function (x) { return clean(x, 30); }).filter(Boolean).slice(0, 4),
+      time: clean(r.time, 20), line: clean(r.line, 160),
+      story: Array.isArray(r.story) ? r.story.map(function (x) { return clean(x, 1500); }).filter(Boolean) : paras(r.story),
+      points: Array.isArray(r.points) ? r.points.map(function (x) { return clean(x, 80); }).filter(Boolean).slice(0, 6) : lines(r.points, 80, 6),
+      theme: clean(r.theme, 80), note: clean(r.note, 300), art: ARTS.indexOf(str(r.art).trim()) >= 0 ? str(r.art).trim() : '',
+      featured: r.featured === true || yes(r.featured), active: r.active === undefined || r.active === '' ? true : (r.active === true || yes(r.active)), updatedAt: str(r.updatedAt)
+    };
+  }
+  function fromWork(w) {
+    return { id: w.id, order: str(w.order), title: w.title, badge: w.badge, sub: w.sub, genre: w.genre.join(', '), time: w.time, line: w.line, story: w.story.join('\n\n'), points: w.points.join('\n'), theme: w.theme, note: w.note, art: w.art, featured: yn(w.featured), active: yn(w.active), updatedAt: w.updatedAt };
+  }
+  function toPhoto(r) { return { id: str(r.id).trim(), workId: str(r.workId).trim(), order: +r.order || 0, caption: clean(r.caption, 120), src: str(r.src).trim(), home: r.home === true || yes(r.home), createdAt: str(r.createdAt) }; }
+  function fromPhoto(p) { return { id: p.id, workId: p.workId, order: str(p.order), caption: p.caption, src: p.src, home: yn(p.home), createdAt: p.createdAt }; }
+  function workName(w) { return w.sub ? w.title + ' (' + w.sub + ')' : w.title; }
+  /* 사진 위치 → 주소. img:robo-1 (홈페이지 안 사진) · drive:파일번호 (관리자가 올린 사진) · data: (미리보기) */
+  function photoUrl(src, size, root) {
+    src = str(src);
+    if (src.indexOf('drive:') === 0) return 'https://lh3.googleusercontent.com/d/' + src.slice(6) + '=w' + (size > 800 ? 1600 : 800);
+    if (src.indexOf('img:') === 0) return (root || '') + 'img/' + src.slice(4) + '-' + (size > 800 ? 1600 : 800) + '.webp';
+    if (/^data:image\//.test(src)) return src;
+    return '';
+  }
   function fromEvent(e) { var o = {}; SCHEMA.events.cols.forEach(function (c) { o[c[0]] = str(e[c[0]]); }); return o; }
 
   /* ---------- 읽기 ---------- */
@@ -132,6 +163,16 @@ var JG = (function () {
   }
   function readEvents(env) {
     return env.store.read('events').map(toEvent).filter(function (e) { return e.date; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.time < b.time ? -1 : 1); });
+  }
+  function readWorks(env) {
+    return env.store.read('works').map(toWork).filter(function (w) { return w.id && w.title; }).sort(function (a, b) { return a.order - b.order; });
+  }
+  function readPhotos(env) {
+    return env.store.read('photos').map(toPhoto).filter(function (p) { return p.id && p.src; }).sort(function (a, b) { return a.order - b.order; });
+  }
+  function workTitles(env) {
+    var ws = readWorks(env).filter(function (w) { return w.active; }).map(workName);
+    return ws.length ? ws : WORKS.slice();
   }
   function readInquiries(env) {
     return env.store.read('inquiries').map(toInquiry).filter(function (q) { return q.id; }).sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
@@ -204,6 +245,7 @@ var JG = (function () {
       if (a === 'ping' || a === 'status') return { ok: true, claimed: !!env.props.get('ADMIN_HASH') };
       if (a === 'claim') return claim(req, env);
       if (a === 'public') return publicData(env);
+      if (a === 'content') return contentData(env);
       if (a === 'inquire') return inquire(req, env);
       if (a === 'login') return login(req, env);
       if (!auth(req, env)) return fail('auth', '다시 로그인해 주세요.');
@@ -218,6 +260,11 @@ var JG = (function () {
         case 'resetQuestions': return resetQuestions(env);
         case 'saveSettings': return saveSettings(req, env);
         case 'changePassword': return changePassword(req, env);
+        case 'saveWork': return saveWork(req, env);
+        case 'deleteWork': return deleteWork(req, env);
+        case 'orderWorks': return orderWorks(req, env);
+        case 'addPhoto': return addPhoto(req, env);
+        case 'savePhotos': return savePhotos(req, env);
         case 'logout': env.cache.remove('tok:' + str(req.token)); return { ok: true };
       }
       return fail('action', '알 수 없는 요청입니다.');
@@ -242,6 +289,25 @@ var JG = (function () {
     return out;
   }
   function dirty(env) { try { env.cache.remove('public'); } catch (e) {} }
+  function dirtyContent(env) {
+    try { env.cache.remove('content'); } catch (e) {}
+    try { env.props.set('CONTENT_VER', String((+env.props.get('CONTENT_VER') || 0) + 1)); } catch (e) {}
+  }
+
+  /* 홈페이지에 보이는 작품과 사진 (공개) */
+  function contentData(env) {
+    var cached = env.cache.get('content');
+    if (cached) { try { return JSON.parse(cached); } catch (e) {} }
+    var works = readWorks(env).filter(function (w) { return w.active; });
+    var ids = {}; works.forEach(function (w) { ids[w.id] = true; });
+    var out = {
+      ok: true, ver: +env.props.get('CONTENT_VER') || 0,
+      works: works.map(function (w) { return { id: w.id, title: w.title, badge: w.badge, sub: w.sub, genre: w.genre, time: w.time, line: w.line, story: w.story, points: w.points, theme: w.theme, note: w.note, art: w.art, featured: w.featured }; }),
+      photos: readPhotos(env).filter(function (p) { return p.workId === '' || ids[p.workId]; }).map(function (p) { return { id: p.id, workId: p.workId, caption: p.caption, src: p.src, home: p.home }; })
+    };
+    try { env.cache.put('content', JSON.stringify(out), 300); } catch (e) {}
+    return out;
+  }
 
   function inquire(req, env) {
     if (str(req.website)) return { ok: true, id: 'OK' };
@@ -322,7 +388,7 @@ var JG = (function () {
       ok: true, today: env.today(),
       events: readEvents(env), inquiries: readInquiries(env), questions: readQuestions(env),
       settings: SETTINGS.map(function (d) { return { key: d[0], label: d[1], help: d[3], value: raw.hasOwnProperty(d[0]) ? raw[d[0]] : d[2] }; }),
-      parsed: s, works: WORKS, types: TYPES, statuses: STATUSES, kinds: KINDS, visibilities: VIS
+      parsed: s, works: workTitles(env), workList: readWorks(env), photos: readPhotos(env), arts: ARTS, drive: !!env.drive, types: TYPES, statuses: STATUSES, kinds: KINDS, visibilities: VIS
     };
   }
 
@@ -375,7 +441,8 @@ var JG = (function () {
     var q = readInquiries(env).filter(function (x) { return x.id === id; })[0];
     if (!q) return fail('missing', '문의를 찾을 수 없어요.');
     var play = '';
-    q.answers.forEach(function (a) { if (a.id === 'q-play' && WORKS.indexOf(str(a.value)) >= 0) play = str(a.value); });
+    var titles = workTitles(env);
+    q.answers.forEach(function (a) { if (a.id === 'q-play' && (titles.indexOf(str(a.value)) >= 0 || WORKS.indexOf(str(a.value)) >= 0)) play = str(a.value); });
     var time = '';
     q.answers.forEach(function (a) { if (a.id === 'q-time' && str(a.value) !== '상관없음') time = str(a.value); });
     var r = saveEvent({ event: { date: q.date, time: time, kind: '공연', title: play, place: q.org, region: '', visibility: '기관 숨김', memo: '문의 ' + q.id + ' · ' + q.name + ' ' + q.phone } }, env);
@@ -437,6 +504,98 @@ var JG = (function () {
     return { ok: true };
   }
 
+  /* ---------- 작품·사진 ---------- */
+  function saveWork(req, env) {
+    var w = toWork(req.work || {}), errors = {};
+    if (!w.title) errors.title = '작품 제목을 적어 주세요';
+    if (!w.line) errors.line = '한 줄 소개를 적어 주세요';
+    if (Object.keys(errors).length) return fail('invalid', '고칠 내용이 있어요.', { errors: errors });
+    var list = Array.isArray(req.photos) ? req.photos : null, out, gone = [];
+    env.lock(function () {
+      var works = env.store.read('works').map(toWork), found = null;
+      works.forEach(function (x) { if (w.id && x.id === w.id) found = x; });
+      if (!found) {
+        if (works.length >= MAX_WORKS) { out = fail('invalid', '작품은 ' + MAX_WORKS + '편까지 만들 수 있어요.'); return; }
+        w.id = 'w-' + env.uuid().slice(0, 6).toLowerCase();
+        w.order = works.reduce(function (m, x) { return Math.max(m, x.order); }, 0) + 1;
+        works.push(w);
+      } else {
+        w.order = found.order;
+        works = works.map(function (x) { return x.id === w.id ? w : x; });
+      }
+      w.updatedAt = env.now();
+      if (w.featured) works.forEach(function (x) { if (x.id !== w.id) x.featured = false; });
+      env.store.write('works', works.sort(function (a, b) { return a.order - b.order; }).map(fromWork));
+      if (list) gone = applyPhotos(env, w.id, list);
+      out = { ok: true, work: w };
+    });
+    if (!out.ok) return out;
+    gone.forEach(function (p) { if (env.drive) try { env.drive.trash(p.src); } catch (e) {} });
+    dirtyContent(env);
+    out.photos = readPhotos(env).filter(function (p) { return p.workId === out.work.id; });
+    return out;
+  }
+  /* 한 작품(또는 공통 사진 '')의 사진 순서·설명·홈 표시를 목록대로 맞추고, 목록에 없는 사진은 지웁니다 */
+  function applyPhotos(env, workId, list) {
+    var photos = env.store.read('photos').map(toPhoto), mine = {}, rest = [], kept = [], gone = [];
+    photos.forEach(function (p) { if (p.workId === workId) mine[p.id] = p; else rest.push(p); });
+    list.forEach(function (x, i) {
+      var p = mine[str(x && x.id)];
+      if (!p) return;
+      p.order = i + 1; p.caption = clean(x.caption, 120); p.home = x.home === true || yes(x.home);
+      kept.push(p); delete mine[p.id];
+    });
+    Object.keys(mine).forEach(function (k) { gone.push(mine[k]); });
+    env.store.write('photos', rest.concat(kept).map(fromPhoto));
+    return gone;
+  }
+  function savePhotos(req, env) {
+    var workId = str(req.workId), list = Array.isArray(req.photos) ? req.photos : [], gone = [];
+    if (workId && !readWorks(env).some(function (w) { return w.id === workId; })) return fail('missing', '작품을 찾을 수 없어요. 새로고침해 주세요.');
+    env.lock(function () { gone = applyPhotos(env, workId, list); });
+    gone.forEach(function (p) { if (env.drive) try { env.drive.trash(p.src); } catch (e) {} });
+    dirtyContent(env);
+    return { ok: true, photos: readPhotos(env).filter(function (p) { return p.workId === workId; }) };
+  }
+  function deleteWork(req, env) {
+    var id = str(req.id), gone = [];
+    env.lock(function () {
+      env.store.write('works', env.store.read('works').map(toWork).filter(function (w) { return w.id !== id; }).map(fromWork));
+      var photos = env.store.read('photos').map(toPhoto);
+      gone = photos.filter(function (p) { return p.workId === id; });
+      env.store.write('photos', photos.filter(function (p) { return p.workId !== id; }).map(fromPhoto));
+    });
+    gone.forEach(function (p) { if (env.drive) try { env.drive.trash(p.src); } catch (e) {} });
+    dirtyContent(env);
+    return { ok: true };
+  }
+  function orderWorks(req, env) {
+    var ids = Array.isArray(req.ids) ? req.ids.map(str) : [];
+    env.lock(function () {
+      var works = env.store.read('works').map(toWork);
+      works.forEach(function (w) { var i = ids.indexOf(w.id); w.order = i >= 0 ? i + 1 : ids.length + w.order; });
+      works.sort(function (a, b) { return a.order - b.order; }).forEach(function (w, i) { w.order = i + 1; });
+      env.store.write('works', works.map(fromWork));
+    });
+    dirtyContent(env);
+    return { ok: true, works: readWorks(env) };
+  }
+  function addPhoto(req, env) {
+    if (!env.drive) return fail('drive', '사진 저장소가 아직 연결되지 않았어요. 제작자에게 알려 주세요.');
+    var workId = str(req.workId), data = str(req.data).replace(/^data:[^,]*,/, ''), mime = str(req.mime) || 'image/jpeg';
+    if (!/^image\/(jpeg|png|webp)$/.test(mime)) return fail('invalid', 'JPG·PNG 사진만 올릴 수 있어요.');
+    if (!data || data.length > 14000000 || !/^[A-Za-z0-9+/=\s]+$/.test(data.slice(0, 2000))) return fail('invalid', '사진을 읽지 못했어요. 다른 사진으로 해 보세요.');
+    var work = workId ? readWorks(env).filter(function (w) { return w.id === workId; })[0] : { title: '징검다리' };
+    if (!work) return fail('missing', '작품을 찾을 수 없어요. 새로고침해 주세요.');
+    var mine = readPhotos(env).filter(function (p) { return p.workId === workId; });
+    if (mine.length >= MAX_PHOTOS) return fail('invalid', '작품마다 사진은 ' + MAX_PHOTOS + '장까지 올릴 수 있어요.');
+    var src = env.drive.save(data, mime, (workId || 'common') + '-' + env.now().replace(/\D/g, '') + (mime === 'image/png' ? '.png' : '.jpg'));
+    var p = { id: 'P' + env.uuid().slice(0, 8).toUpperCase(), workId: workId, order: mine.reduce(function (m, x) { return Math.max(m, x.order); }, 0) + 1, caption: clean(req.caption, 120) || work.title + ' 공연 사진', src: src, home: false, createdAt: env.now() };
+    env.lock(function () { env.store.append('photos', fromPhoto(p)); });
+    dirtyContent(env);
+    return { ok: true, photo: p };
+  }
+
   /* 처음 한 번: 시트와 기본값 만들기 (이미 있는 내용은 지우지 않습니다) */
   function setup(env, opts) {
     opts = opts || {};
@@ -450,11 +609,16 @@ var JG = (function () {
     }));
     env.store.read('events');
     env.store.read('inquiries');
+    if (!env.store.read('works').length && opts.seed && Array.isArray(opts.seed.works)) {
+      env.store.write('works', opts.seed.works.map(function (w, i) { var x = toWork(w); x.order = i + 1; return fromWork(x); }));
+      env.store.write('photos', (opts.seed.photos || []).map(function (p, i) { var x = toPhoto(p); x.order = x.order || i + 1; return fromPhoto(x); }));
+    } else { env.store.read('works'); env.store.read('photos'); }
     dirty(env);
   }
 
   return {
-    WEEK: WEEK, TYPES: TYPES, STATUSES: STATUSES, KINDS: KINDS, VIS: VIS, WORKS: WORKS, SETTINGS: SETTINGS, QUESTIONS: QUESTIONS, SCHEMA: SCHEMA, STATUS_TEXT: STATUS_TEXT,
+    WEEK: WEEK, TYPES: TYPES, STATUSES: STATUSES, KINDS: KINDS, VIS: VIS, WORKS: WORKS, ARTS: ARTS, SETTINGS: SETTINGS, QUESTIONS: QUESTIONS, SCHEMA: SCHEMA, STATUS_TEXT: STATUS_TEXT,
+    photoUrl: photoUrl, workName: workName, toWork: toWork, fromWork: fromWork, fromPhoto: fromPhoto,
     handle: handle, setup: setup, dayInfo: dayInfo, checkAnswer: checkAnswer, checkContact: checkContact, parseSettings: parseSettings,
     normDate: normDate, addDays: addDays, addMonths: addMonths, weekday: weekday, monthStart: monthStart, dateLabel: dateLabel, answerText: answerText, typeLabel: typeLabel,
     fromEvent: fromEvent, fromInquiry: fromInquiry, fromQuestion: fromQuestion

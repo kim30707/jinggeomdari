@@ -6,6 +6,12 @@
   var mode = CFG.apiUrl ? 'live' : (local ? 'preview' : 'off');
   var KEY = 'jg-preview-v1', CKEY = 'jg-preview-cache';
   var mem = { db: null, cache: {} };
+  var me = document.currentScript, base = me && me.src ? me.src.replace(/js\/api\.js(\?.*)?$/, '') : '';
+  var seed = null;
+  function loadSeed() {
+    if (seed) return Promise.resolve(seed);
+    return fetch(base + 'data/content.json').then(function (r) { return r.json(); }).then(function (d) { seed = d; return d; }).catch(function () { seed = { works: [], photos: [] }; return seed; });
+  }
 
   function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return mem.db; } }
   function save(db) { mem.db = db; try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} }
@@ -40,16 +46,21 @@
       setPassword: function (pw) { db.props.ADMIN_HASH = 'p:' + pw; save(db); },
       setupCode: function (c) { return c === 'PREVIEW'; },
       mail: function (to, subject) { if (window.console) console.info('[미리보기] 알림 메일:', to, subject); },
+      drive: {
+        save: function (b64, mime) { return 'data:' + mime + ';base64,' + b64; },
+        trash: function () {}
+      },
       lock: function (fn) { fn(); },
       ensure: function () {
-        if (db.props.READY) return;
-        JG.setup(env, {});
+        if (db.props.READY === '3') return;
+        JG.setup(env, { seed: seed });
+        if (db.props.READY) { db.props.READY = '3'; save(db); return; }
         var t = env.today();
         env.store.write('events', [
           { id: 'E-SAMPLE1', date: JG.addDays(t, 12), time: '10:30', kind: '공연', title: '은혜갚은 호랑이', place: '부산 해운대 ○○ 직장어린이집 (예시)', region: '해운대구', visibility: '기관 숨김', memo: '미리보기 예시 일정', createdAt: env.now() },
           { id: 'E-SAMPLE2', date: JG.addDays(t, 19), time: '', kind: '불가', title: '', place: '', region: '', visibility: '기관 숨김', memo: '미리보기 예시: 극단 사정', createdAt: env.now() }
         ].map(JG.fromEvent));
-        db.props.READY = '1';
+        db.props.READY = '3';
         db.props.ADMIN_HASH = 'p:preview1234';
         save(db);
       }
@@ -68,8 +79,10 @@
         .catch(function () { return { ok: false, code: 'network', message: '연결이 잠시 원활하지 않아요. 잠시 후 다시 시도해 주세요.' }; });
     }
     if (mode === 'preview') {
-      return new Promise(function (res) {
-        setTimeout(function () { res(JSON.parse(JSON.stringify(JG.handle(Object.assign({ action: action }, data), previewEnv())))); }, 220);
+      return loadSeed().then(function () {
+        return new Promise(function (res) {
+          setTimeout(function () { res(JSON.parse(JSON.stringify(JG.handle(Object.assign({ action: action }, data), previewEnv())))); }, 220);
+        });
       });
     }
     return Promise.resolve({ ok: false, code: 'off', message: '온라인 일정이 아직 연결되지 않았어요.' });
