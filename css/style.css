@@ -97,7 +97,7 @@ p { margin: 0; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-size: 27px; white-space: nowrap; }
 /* 이름: 아동극단은 작은 글씨, 징검다리를 크게 */
 .bn { white-space: nowrap; }
-.bn small { font-family: var(--body); font-size: max(11.5px, .46em); font-weight: 700; letter-spacing: .06em; color: var(--ink-soft); margin-right: 3px; }
+.bn small { font-family: var(--body); font-size: max(10px, .38em); font-weight: 600; letter-spacing: .04em; color: var(--ink-soft); opacity: .75; margin-right: 2px; }
 .stones-mark { display: flex; gap: 3px; align-items: flex-end; }
 .stones-mark span { width: 12px; height: 8px; border-radius: 50%; background: var(--leaf); }
 .stones-mark span:nth-child(2) { background: var(--accent); transform: translateY(-4px); }
@@ -129,7 +129,7 @@ p { margin: 0; }
 .slide-title .ln { display: block; overflow: hidden; padding-bottom: .12em; margin-bottom: -.12em; }
 .slide-title .ln > span { display: block; }
 .slide-title em { font-style: normal; color: var(--accent); }
-.slide-title em .bn small { font-size: .42em; letter-spacing: .04em; }
+.slide-title em .bn small { font-size: .32em; letter-spacing: .03em; }
 .slide-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
 .stage { position: relative; min-width: 0; }
 .stage-frame { position: relative; aspect-ratio: 3 / 2; border-radius: var(--radius); overflow: hidden; background: var(--stone); box-shadow: var(--shadow); max-width: 100%; }
@@ -568,7 +568,7 @@ textarea.inp { min-height: 96px; resize: vertical; }
     .first .stage-stones span { animation: rise var(--d-line) var(--ease-out) both; animation-delay: calc(1000ms + var(--i, 0) * 80ms); }
     .first .page-hero .kicker { animation: tighten var(--d-line) var(--ease-out) both; }
     .first .page-hero h1 .ln > span { animation: lineUp var(--d-line) var(--ease-out) both; animation-delay: calc(150ms + var(--i, 0) * var(--beat)); }
-    .first .page-hero .lead, .first .page-hero .chips, .first .page-hero .copy > .btn, .first .page-hero .copy > .crumbs { animation: rise var(--d-line) var(--ease-out) 450ms both; }
+    .first .page-hero .lead, .first .page-hero .chips, .first .page-hero .copy > .btn, .first .page-hero .copy > .row-cta, .first .page-hero .copy > .crumbs { animation: rise var(--d-line) var(--ease-out) 450ms both; }
     .first .page-hero .ph-wrap { animation: wipeIn var(--d-wipe) var(--ease-glide) both; }
     .first .page-hero .stamp { animation: stamp 300ms var(--ease-out) 900ms both; }
   }
@@ -595,3 +595,74 @@ html:not(.js) .stage-bar { display: none; }
 .aud .ic { font-size: 40px; color: var(--accent); margin-bottom: auto; }
 .aud.sun .ic { color: #8a5a00; }
 .page-hero .copy > .btn, .page-hero .copy > .stamp { justify-self: start; }
+
+/* ===== 작품 상세 안내 (works/*-detail.html) ===== */
+.row-cta { display: flex; flex-wrap: wrap; gap: 10px; justify-self: start; }
+.dt-hero { position: relative; display: grid; }
+.dt-hero-ph { grid-area: 1 / 1; max-height: 78vh; overflow: hidden; background: #1d1a16; }
+.dt-hero-ph img { width: 100%; height: 100%; max-height: 78vh; object-fit: cover; display: block; }
+.dt-hero-copy { grid-area: 1 / 1; align-self: end; z-index: 1; display: grid; gap: 12px; padding: 120px max(20px, calc((100% - var(--max)) / 2)) 44px; background: linear-gradient(180deg, transparent, rgba(20, 16, 12, .82) 62%); color: #fffaf2; }
+.dt-hero-copy .crumbs, .dt-hero-copy .crumbs a { color: rgba(255, 250, 242, .78); }
+.dt-kicker { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--sun); }
+.dt-title { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 8vw, 92px); line-height: 1.02; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.dt-tag { font-size: clamp(17px, 2.2vw, 21px); max-width: 40ch; line-height: 1.55; }
+.dt-hero-copy .btn-ghost { color: #fffaf2; border-color: rgba(255, 250, 242, .7); }
+.dt-body { width: min(920px, 100% - 32px); margin: 0 auto; padding: 56px 0 24px; display: grid; gap: 64px; }
+.dt-sec { display: grid; gap: 22px; }
+.dt-h { display: flex; align-items: baseline; gap: 14px; font-family: var(--display); font-weight: 400; font-size: clamp(28px, 4vw, 38px); margin: 0; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+.dt-h span { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+.dt-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; margin: 0; }
+.dt-info div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.dt-info dt { color: var(--ink-soft); font-size: 14.5px; font-weight: 600; }
+.dt-info dd { margin: 0; font-weight: 700; }
+.dt-text { display: grid; gap: 14px; font-size: 18px; line-height: 1.8; }
+.dt-text p { max-width: 62ch; margin: 0; }
+.dt-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dt-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: grid; align-content: start; }
+.dt-card .ph img { aspect-ratio: 4 / 3; object-fit: cover; width: 100%; display: block; }
+.dt-card h3 { font-size: 20px; margin: 16px 18px 6px; }
+.dt-card p { color: var(--ink-soft); font-size: 15px; line-height: 1.6; margin: 0 18px 18px; }
+.dt-scenes { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; }
+.dt-scene { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: center; }
+.dt-scene:nth-child(even) figure { order: 2; }
+.dt-scene figure { margin: 0; display: grid; gap: 8px; }
+.dt-scene img { border-radius: var(--radius); aspect-ratio: 3 / 2; object-fit: cover; width: 100%; }
+.dt-scene figcaption { font-size: 13.5px; color: var(--ink-soft); }
+.dt-scene > div { display: grid; gap: 8px; }
+.dt-no { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+.dt-scene h3 { font-size: 24px; margin: 0; }
+.dt-scene p { font-size: 17px; line-height: 1.8; margin: 0; }
+.dt-more { font-weight: 700; color: var(--leaf); }
+.dt-tint { background: var(--tint); border-radius: var(--radius); padding: 28px; }
+.dt-tint .dt-h { border-color: rgba(0, 0, 0, .15); }
+.dt-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dt-points li { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border-radius: 14px; padding: 12px 16px; font-weight: 700; font-size: 17px; }
+.dt-points i { color: var(--leaf); font-size: 20px; margin-top: 2px; }
+.dt-theme { font-size: 18px; margin: 0; }
+.dt-theme b { font-family: var(--display); font-weight: 400; font-size: 24px; color: var(--accent); margin-left: 6px; }
+.dt-fits { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dt-fit { display: grid; gap: 4px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.dt-fit b { font-size: 18px; }
+.dt-fit span { color: var(--ink-soft); font-size: 15px; }
+.dt-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dt-brand { font-family: var(--display); font-size: 40px; margin: 0; }
+.dt-history { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 0; border-left: 3px solid var(--leaf); }
+.dt-history li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; padding: 10px 0 10px 18px; }
+.dt-history b { font-family: var(--mono); font-size: 14px; color: var(--leaf); }
+@media (max-width: 760px) {
+  .dt-hero-ph, .dt-hero-ph img { max-height: none; }
+  .dt-hero { grid-template-rows: auto auto; }
+  .dt-hero-copy { grid-area: 2 / 1; padding: 22px 16px 28px; background: #1d1a16; }
+  .dt-info, .dt-cards, .dt-fits, .dt-scene { grid-template-columns: 1fr; }
+  .dt-scene:nth-child(even) figure { order: 0; }
+  .dt-gallery { grid-template-columns: 1fr 1fr; }
+  .dt-history li { grid-template-columns: 1fr; gap: 2px; }
+  .dt-tint { padding: 20px 16px; }
+}
+@media print {
+  .site-header, .site-footer, .skip, .dt .cta-band, .dt-hero .row-cta { display: none !important; }
+  .dt-hero-copy { background: none; color: var(--ink); padding: 18px 0 0; grid-area: 2 / 1; }
+  .dt-hero-copy .crumbs { display: none; }
+  .dt-body { gap: 28px; padding-top: 18px; }
+  .dt-scene, .dt-card, .dt-fit, .dt-sec h2 { break-inside: avoid; }
+}
