@@ -171,7 +171,7 @@
 .hm-title .bn small { color: var(--cream); }
 .hm-hero .dx-hero-in { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); }
 .hm-fan { position: relative; width: 100%; aspect-ratio: 1 / .93; }
-.hm-fan-card { position: absolute; top: 9%; width: 56%; aspect-ratio: 800 / 1192; border-radius: 14px; overflow: hidden; box-shadow: 0 26px 50px -22px rgba(0, 0, 0, .65); transition: transform .35s var(--ease-out); }
+.hm-fan-card { position: absolute; top: 9%; width: 56%; aspect-ratio: 800 / 1131; border-radius: 14px; overflow: hidden; box-shadow: 0 26px 50px -22px rgba(0, 0, 0, .65); transition: transform .35s var(--ease-out); }
 .hm-fan-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .hm-fan-card.c1 { left: 0; transform: rotate(-8deg); }
 .hm-fan-card.c3 { right: 0; transform: rotate(8deg); }
@@ -182,9 +182,9 @@
 /* 공연 작품: 포스터 벽 */
 .hm-plays { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 28px); }
 .hm-play { display: grid; gap: 12px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
-.hm-play-ph { position: relative; display: block; border-radius: 14px; overflow: hidden; aspect-ratio: 2 / 3; box-shadow: 0 18px 34px -20px rgba(40, 40, 80, .55); background: var(--surface); }
+.hm-play-ph { position: relative; display: block; border-radius: 14px; overflow: hidden; aspect-ratio: 800 / 1131; box-shadow: 0 18px 34px -20px rgba(40, 40, 80, .55); background: var(--surface); }
 .hm-play-ph img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--d-photo, .6s) var(--ease-out); }
-.hm-play-ph .badge { position: absolute; left: 10px; top: 10px; z-index: 1; }
+.hm-play-body .badge { position: static; justify-self: start; font-size: 12px; padding: 4px 10px; }  /* 포스터 글자를 가리지 않게 그림 아래에 */
 .hm-play-art { display: grid; place-items: center; height: 100%; padding: 16px; text-align: center; font-family: var(--display); font-size: 26px; }
 .hm-play-body { display: grid; gap: 6px; }
 .hm-play .meta { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: .02em; }

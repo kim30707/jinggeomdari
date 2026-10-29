@@ -54,12 +54,12 @@
     var pic;
     if (details[w.id]) {
       var n = root + 'img/' + details[w.id];
-      pic = h('img', { src: n + '-800.webp', srcset: n + '-800.webp 800w, ' + n + '-1600.webp 1600w', sizes: '(max-width: 600px) 46vw, (max-width: 1000px) 30vw, 260px', alt: '「' + w.title + '」 대표 그림', width: '800', height: '1192', loading: 'lazy', decoding: 'async' });
+      pic = h('img', { src: n + '-800.webp', srcset: n + '-800.webp 800w, ' + n + '-1600.webp 1600w', sizes: '(max-width: 600px) 46vw, (max-width: 1000px) 30vw, 260px', alt: '「' + w.title + '」 ' + (/-poster/.test(details[w.id]) ? '포스터' : '대표 그림'), width: '800', height: /-poster/.test(details[w.id]) ? '1131' : '1192', loading: 'lazy', decoding: 'async' });
     } else if (ph.length) pic = image(ph[0], '(max-width: 600px) 46vw, 260px');
     else pic = h('span', { class: 'hm-play-art ' + (w.art || 'art-sun'), 'aria-hidden': 'true', text: w.title });
     var title = h('b', { class: 'hm-play-title' }, [w.title, w.sub ? h('small', { text: w.sub }) : null]);
-    return h('a', { class: 'hm-play reveal', href: link(w) }, [h('span', { class: 'hm-play-ph' }, [pic, badge]),
-      h('span', { class: 'hm-play-body' }, [h('span', { class: 'meta', text: meta(w) }), title, h('span', { class: 'hm-play-line', text: w.line }), h('span', { class: 'go' }, ['상세 안내 ', h('span', { class: 'arr', text: '→' })])])]);
+    return h('a', { class: 'hm-play reveal', href: link(w) }, [h('span', { class: 'hm-play-ph' }, [pic]),
+      h('span', { class: 'hm-play-body' }, [badge, h('span', { class: 'meta', text: meta(w) }), title, h('span', { class: 'hm-play-line', text: w.line }), h('span', { class: 'go' }, ['상세 안내 ', h('span', { class: 'arr', text: '→' })])])]);
   }
   function polaroid(p) {
     return h('button', { class: 'reveal', type: 'button', 'data-full': src(p, 1600), 'data-caption': p.caption || '', 'aria-label': (p.caption || '공연 사진') + ' 크게 보기' },
