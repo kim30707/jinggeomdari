@@ -10,6 +10,8 @@
   var body = document.body;
   var pageVer = +(body.getAttribute('data-content-ver') || 0);
   var statics = (body.getAttribute('data-static-works') || '').split(',').filter(Boolean);
+  var details = {}; // 상세 안내가 있는 작품 → 대표 그림 이름 (만드는 쪽 build.py 의 key_art)
+  (body.getAttribute('data-detail-works') || '').split(',').forEach(function (x) { var kv = x.split(':'); if (kv[0]) details[kv[0]] = kv[1]; });
   var main = document.querySelector('main[data-work]');
   var isView = !!main && !main.getAttribute('data-work');
   var viewId = isView ? new URLSearchParams(location.search).get('w') || '' : '';
@@ -25,7 +27,10 @@
     (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
     return e;
   }
-  function link(w) { return statics.indexOf(w.id) >= 0 ? root + 'works/' + w.id + '.html' : root + 'works/view.html?w=' + encodeURIComponent(w.id); }
+  function link(w) {
+    if (details[w.id]) return root + 'works/' + w.id + '-detail.html';
+    return statics.indexOf(w.id) >= 0 ? root + 'works/' + w.id + '.html' : root + 'works/view.html?w=' + encodeURIComponent(w.id);
+  }
   function src(p, size) { return J.photoUrl(p.src, size, root); }
   function image(p, sizes, eager) {
     var s = src(p, 800), l = src(p, 1600);
@@ -43,42 +48,36 @@
   function meta(w) { return w.genre.slice(0, 2).join(' · ') + (w.time ? ' · ' + w.time : ''); }
   function byWork(photos) { var m = {}; photos.forEach(function (p) { (m[p.workId] = m[p.workId] || []).push(p); }); return m; }
 
-  /* 첫 화면: 작품 목록 (만드는 쪽 build.py 의 grid_kinds 와 같은 규칙) */
-  function kinds(works) {
-    var feat = works.filter(function (w) { return w.featured; })[0] || works[0];
-    var order = feat ? [feat].concat(works.filter(function (w) { return w !== feat; })) : works.slice();
-    var ks = order.map(function (w) { return w === feat ? 'featured' : ''; });
-    var cells = (feat ? 4 : 0) + order.length - (feat ? 1 : 0), rem = cells % 4;
-    if ((rem === 1 || rem === 3) && order.length > 1) ks[ks.length - 1] = 'wide';
-    else if (rem === 2 && order.length > 2) { ks[ks.length - 1] = 'wide'; ks[ks.length - 2] = 'wide'; }
-    return order.map(function (w, i) { return [w, ks[i]]; });
-  }
-  function card(w, kind, i, ph) {
-    var cls = 'work-card reveal' + (kind ? ' ' + kind : '');
+  /* 첫 화면: 작품 목록 (만드는 쪽 build.py 의 work_card 와 같은 모양: 대표 그림을 포스터처럼) */
+  function card(w, ph) {
     var badge = w.badge ? h('span', { class: 'badge', text: w.badge }) : null;
-    if (ph.length && !w.art) {
-      var sizes = '(max-width: 600px) 100vw, (max-width: 1000px) 50vw, ' + (kind === 'featured' ? '50vw' : '25vw');
-      var title = h('h3', null, [w.title, w.sub ? h('br') : null, w.sub ? h('small', { style: 'font-size:.62em', text: w.sub }) : null]);
-      return h('a', { class: cls, href: link(w) }, [badge, h('div', { class: 'ph' }, [image(ph[0], sizes)]), h('div', { class: 'body' }, [h('span', { class: 'meta', text: meta(w) }), title, h('p', { text: w.line })])]);
-    }
-    var art = w.art || J.ARTS[i % J.ARTS.length];
-    var sub = w.sub ? h('p', { style: 'text-align:center;font-weight:700;margin-top:6px', text: w.sub }) : null;
-    return h('a', { class: cls + ' art ' + art, href: link(w) }, [badge, h('div', { class: 'art-top' }, [h('div', null, [h('h3', { class: 'art-title', text: w.title }), sub, stones()])]),
-      h('div', { class: 'body' }, [h('span', { class: 'meta', text: meta(w) }), h('p', { text: w.line })])]);
+    var pic;
+    if (details[w.id]) {
+      var n = root + 'img/' + details[w.id];
+      pic = h('img', { src: n + '-800.webp', srcset: n + '-800.webp 800w, ' + n + '-1600.webp 1600w', sizes: '(max-width: 600px) 46vw, (max-width: 1000px) 30vw, 260px', alt: '「' + w.title + '」 대표 그림', width: '800', height: '1192', loading: 'lazy', decoding: 'async' });
+    } else if (ph.length) pic = image(ph[0], '(max-width: 600px) 46vw, 260px');
+    else pic = h('span', { class: 'hm-play-art ' + (w.art || 'art-sun'), 'aria-hidden': 'true', text: w.title });
+    var title = h('b', { class: 'hm-play-title' }, [w.title, w.sub ? h('small', { text: w.sub }) : null]);
+    return h('a', { class: 'hm-play reveal', href: link(w) }, [h('span', { class: 'hm-play-ph' }, [pic, badge]),
+      h('span', { class: 'hm-play-body' }, [h('span', { class: 'meta', text: meta(w) }), title, h('span', { class: 'hm-play-line', text: w.line }), h('span', { class: 'go' }, ['상세 안내 ', h('span', { class: 'arr', text: '→' })])])]);
+  }
+  function polaroid(p) {
+    return h('button', { class: 'reveal', type: 'button', 'data-full': src(p, 1600), 'data-caption': p.caption || '', 'aria-label': (p.caption || '공연 사진') + ' 크게 보기' },
+      [h('span', { class: 'dx-pol' }, [image(p, '(max-width: 760px) 45vw, 30vw'), h('span', { text: p.caption || '' })])]);
   }
   function drawHome(d) {
     var by = byWork(d.photos);
     var grid = document.querySelector('[data-works]');
     if (grid && d.works.length) {
       grid.textContent = '';
-      kinds(d.works).forEach(function (x, i) { grid.appendChild(card(x[0], x[1], i, by[x[0].id] || [])); });
+      d.works.forEach(function (w) { grid.appendChild(card(w, by[w.id] || [])); });
     }
     var gal = document.querySelector('[data-gallery]');
     if (gal) {
       var groups = d.works.map(function (w) { return by[w.id] || []; }).concat([by[''] || []]).map(function (g) { return g.filter(function (p) { return p.home; }); });
       var list = [];
       for (var i = 0; groups.some(function (g) { return i < g.length; }); i++) groups.forEach(function (g) { if (i < g.length) list.push(g[i]); });
-      if (list.length) { gal.textContent = ''; list.forEach(function (p) { gal.appendChild(photoBtn(p, '(max-width: 700px) 100vw, 33vw')); }); }
+      if (list.length) { gal.textContent = ''; gal.setAttribute('data-n', list.length); list.forEach(function (p) { gal.appendChild(polaroid(p)); }); }
     }
   }
   function drawLists(d) {

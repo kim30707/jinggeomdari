@@ -20,14 +20,14 @@
 - [부산·경남 지역](https://kim30707.github.io/jinggeomdari/programs/busan-gyeongnam.html): 아동극단 징검다리는 부산광역시 기장군 기장읍에 있는 부산 아동극단입니다. 부산 16개 구·군과 양산·김해·창원 등 경남 지역의 직장어린이집, 유치원, 어린이집, 학교, 도서관과 축제로 찾아가 아동극과 인형극을 공연합니다. 학교 초청공연부터 도서관·축제의 가족 공연까지 상담하며, 그 밖의 지역은 거리와 일정을 보고 안내합니다.
 
 ## 공연 작품
-- [심술꾼 로보와 꿀꿀이 삼총사](https://kim30707.github.io/jinggeomdari/works/robo.html): 캐릭터 인형극 · 막대 인형극 · 40분. 늘 함께하는 꿀꿀이 삼형제와 변장의 달인, 늑대 로보의 한판 대결
-- [은혜갚은 호랑이](https://kim30707.github.io/jinggeomdari/works/tiger.html): 배우·캐릭터 복합극 · 전래동화 아동극 · 40분. 새끼 호랑이를 구해 준 젊은이에게 찾아온 호랑이의 보은 이야기
-- [용궁으로 간 토끼](https://kim30707.github.io/jinggeomdari/works/rabbit.html): 전래동화 아동극 · 40분. 별주부전을 새롭게 꾸민, 꾀 많은 토끼의 용궁 탈출기
-- [삐뚤빼뚤의 안전일기](https://kim30707.github.io/jinggeomdari/works/safety.html): 캐릭터 인형극 · 안전 교육극. 말썽꾸러기 삐뚤빼뚤의 좌충우돌 소풍날, 생활 안전 이야기
-- [꼬리뽑힌 호랑이](https://kim30707.github.io/jinggeomdari/works/tail.html): 복합극 · 막대 인형극 · 40분. 숲속 친구들을 괴롭히는 호랑이에 맞서 떡장수 할머니와 동물들이 힘을 모아요
-- [팥죽할멈](https://kim30707.github.io/jinggeomdari/works/patjuk.html): 캐릭터 인형극 · 40분. 부지런한 할머니와 지게·멍석·알밤 친구들, 그리고 배고픈 호랑이
-- [배탈난 호랑이](https://kim30707.github.io/jinggeomdari/works/stomach.html): 아동극 · 생활습관 교육극. 자랑쟁이 호랑이가 거짓말하고 쓰레기를 함부로 버리는 버릇을 고치는 이야기
-- [안돼요 안돼!](https://kim30707.github.io/jinggeomdari/works/no.html): 캐릭터 인형극 · 성폭력 예방 교육극 · 40분. 싫은 건 싫다고 말해요. 친구들과 함께 위기를 이겨 내는 예방 인형극
+- [심술꾼 로보와 꿀꿀이 삼총사](https://kim30707.github.io/jinggeomdari/works/robo-detail.html): 캐릭터 인형극 · 막대 인형극 · 40분. 늘 함께하는 꿀꿀이 삼형제와 변장의 달인, 늑대 로보의 한판 대결
+- [은혜갚은 호랑이](https://kim30707.github.io/jinggeomdari/works/tiger-detail.html): 배우·캐릭터 복합극 · 전래동화 아동극 · 40분. 새끼 호랑이를 구해 준 젊은이에게 찾아온 호랑이의 보은 이야기
+- [용궁으로 간 토끼](https://kim30707.github.io/jinggeomdari/works/rabbit-detail.html): 전래동화 아동극 · 40분. 별주부전을 새롭게 꾸민, 꾀 많은 토끼의 용궁 탈출기
+- [삐뚤빼뚤의 안전일기](https://kim30707.github.io/jinggeomdari/works/safety-detail.html): 캐릭터 인형극 · 안전 교육극. 말썽꾸러기 삐뚤빼뚤의 좌충우돌 소풍날, 생활 안전 이야기
+- [꼬리뽑힌 호랑이](https://kim30707.github.io/jinggeomdari/works/tail-detail.html): 복합극 · 막대 인형극 · 40분. 숲속 친구들을 괴롭히는 호랑이에 맞서 떡장수 할머니와 동물들이 힘을 모아요
+- [팥죽할멈](https://kim30707.github.io/jinggeomdari/works/patjuk-detail.html): 캐릭터 인형극 · 40분. 부지런한 할머니와 지게·멍석·알밤 친구들, 그리고 배고픈 호랑이
+- [배탈난 호랑이](https://kim30707.github.io/jinggeomdari/works/stomach-detail.html): 아동극 · 생활습관 교육극. 자랑쟁이 호랑이가 거짓말하고 쓰레기를 함부로 버리는 버릇을 고치는 이야기
+- [안돼요 안돼!](https://kim30707.github.io/jinggeomdari/works/no-detail.html): 캐릭터 인형극 · 성폭력 예방 교육극 · 40분. 싫은 건 싫다고 말해요. 친구들과 함께 위기를 이겨 내는 예방 인형극
 
 ## 자주 묻는 질문
 - 아동극단 징검다리는 어떤 극단인가요? 부산광역시 기장군에 있는 아동극단입니다(대표 백정임). 온 가족이 함께 보는 아동극과 인형극을 만들며, 2009년부터 어린이 예방극을, 2018년부터 부산광역시교육청 학교로 찾아가는 공연을 해 왔습니다.
@@ -50,4 +50,4 @@
 - [처음 화면과 공연 일정 달력](https://kim30707.github.io/jinggeomdari/)
 - [자주 묻는 질문](https://kim30707.github.io/jinggeomdari/faq.html)
 
-최종 업데이트: 2026-10-29
+최종 업데이트: 2026-10-30

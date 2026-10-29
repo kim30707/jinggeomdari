@@ -159,3 +159,86 @@
   .dx-sec { padding: 24px 0; }
   .dx-step, .dx-chars li, .dx-points li, .dx-fits li { break-inside: avoid; }
 }
+
+/* ===== 홈페이지 전체 (2026-10-30): 처음 화면·찾아가는 공연·자주 묻는 질문도 같은 꾸밈 ===== */
+.hm-center { text-align: center; display: flex; justify-content: center; }
+.hm-narrow { max-width: 900px; }
+.hm-answer { text-align: center; margin: -12px auto 32px; }
+
+/* 처음 화면 첫 화면: 대표 그림 세 장을 부채처럼 */
+.hm-title { font-size: clamp(48px, 7.4vw, 92px); }
+.hm-title .bn { display: inline-block; color: var(--sun); }
+.hm-title .bn small { color: var(--cream); }
+.hm-hero .dx-hero-in { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); }
+.hm-fan { position: relative; width: 100%; aspect-ratio: 1 / .93; }
+.hm-fan-card { position: absolute; top: 9%; width: 56%; aspect-ratio: 800 / 1192; border-radius: 14px; overflow: hidden; box-shadow: 0 26px 50px -22px rgba(0, 0, 0, .65); transition: transform .35s var(--ease-out); }
+.hm-fan-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hm-fan-card.c1 { left: 0; transform: rotate(-8deg); }
+.hm-fan-card.c3 { right: 0; transform: rotate(8deg); }
+.hm-fan-card.c2 { left: 22%; top: 0; z-index: 2; transform: rotate(1deg); }
+.hm-fan-card:hover { transform: translateY(-10px) rotate(0); z-index: 3; }
+.hm-fan-card:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+
+/* 공연 작품: 포스터 벽 */
+.hm-plays { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 28px); }
+.hm-play { display: grid; gap: 12px; align-content: start; text-decoration: none; color: var(--ink); min-width: 0; }
+.hm-play-ph { position: relative; display: block; border-radius: 14px; overflow: hidden; aspect-ratio: 2 / 3; box-shadow: 0 18px 34px -20px rgba(40, 40, 80, .55); background: var(--surface); }
+.hm-play-ph img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--d-photo, .6s) var(--ease-out); }
+.hm-play-ph .badge { position: absolute; left: 10px; top: 10px; z-index: 1; }
+.hm-play-art { display: grid; place-items: center; height: 100%; padding: 16px; text-align: center; font-family: var(--display); font-size: 26px; }
+.hm-play-body { display: grid; gap: 6px; }
+.hm-play .meta { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: .02em; }
+.hm-play-title { font-family: var(--display); font-weight: 400; font-size: 23px; line-height: 1.25; }
+.hm-play-title small { display: block; font-family: var(--body); font-size: 13.5px; font-weight: 700; color: var(--ink-soft); }
+.hm-play-line { color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+.hm-play .go { font-weight: 700; font-size: 15px; color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .hm-play:hover .hm-play-ph img { transform: scale(1.04); } .hm-play:hover .go .arr { transform: translateX(4px); } }
+.hm-play:focus-visible .hm-play-ph { outline: 3px solid var(--accent); outline-offset: 4px; }
+
+/* 극단 소개 · 찾아가는 공연 */
+.hm-about { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+.hm-about .dx-pol img { aspect-ratio: 4 / 5; }
+.hm-about .about-body { display: grid; gap: 20px; min-width: 0; }
+.hm-visit { display: grid; gap: 18px; }
+.home .schedule { background: var(--surface); border-block: 1px solid var(--line); }
+.home .faq-list { max-width: 900px; margin: 0 auto; }
+.home .sns { max-width: 1000px; margin: 0 auto; }
+.home .timeline { margin-top: 10px; }
+
+/* 찾아가는 공연·자주 묻는 질문 첫 화면 */
+.dx-hero-sm .dx-hero-in { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); padding-bottom: clamp(90px, 10vw, 128px); }
+.dx-title-sm { font-size: clamp(40px, 6vw, 72px); line-height: 1.08; }
+.dx-tag a { color: var(--sun); }
+.dx-chips span { background: rgba(15, 20, 48, .35); }
+.dx-photo { margin: 0; }
+.dx-photo .dx-pol { --tilt: 2deg; }
+.dx-photo .dx-pol img { aspect-ratio: 4 / 3; }
+
+/* 이 꾸밈을 쓰는 페이지의 예전 칸 제목도 구름 무늬로 */
+.dtx .section-head { justify-items: center; text-align: center; }
+.dtx .section-head h2 { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.dtx .section-head h2::before, .dtx .section-head h2::after { content: ""; flex: none; width: 46px; height: 23px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M4 27c0-5 4-8 9-7 1-6 8-10 14-7 3-5 11-6 15-1 5-2 12 1 12 7 4 0 8 3 8 8z' fill='%23fff' stroke='%23c64a22' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M21 23c0-3 4-4 5-1s-2 4-3 2M39 19c1-3 5-3 5 0s-3 3-4 1' fill='none' stroke='%23c64a22' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / contain; }
+.dtx .section-head h2::after { transform: scaleX(-1); }
+.dtx .section-head .lead, .dtx .section-head .answer { margin-inline: auto; }
+.dtx.sub > section.section { padding: clamp(56px, 8vw, 96px) 0 !important; }
+.dtx.sub > section.section:nth-of-type(even) { background: var(--jade-bg); }
+.dtx.sub .summary-box { margin-top: clamp(28px, 4vw, 48px); }
+.dtx .updated { text-align: center; }
+
+@media (max-width: 1000px) {
+  .hm-plays { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .dx-hero-sm .dx-hero-in { grid-template-columns: 1fr; }
+  .dx-photo { order: -1; width: min(86vw, 420px); justify-self: center; }
+  .hm-hero .dx-hero-in { grid-template-columns: 1fr; }
+  .hm-fan { order: -1; width: min(100%, 440px); justify-self: center; }
+  .hm-about { grid-template-columns: 1fr; }
+  .hm-about .dx-pol { max-width: 420px; justify-self: center; }
+}
+@media (max-width: 760px) {
+  .hm-plays { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  .hm-play-title { font-size: 19px; }
+  .hm-play-line { font-size: 14px; }
+  .dtx .section-head h2::before, .dtx .section-head h2::after { width: 30px; height: 15px; }
+}
