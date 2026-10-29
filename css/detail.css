@@ -1,0 +1,154 @@
+/* ===== 작품 상세 안내 (works/*-detail.html) — 예매처 상세페이지처럼 포스터·그림·사진을 앞세운 꾸밈. 이 페이지에서만 읽습니다 ===== */
+.dtx { --ind: #2f3a6e; --cream: #fff6e3; --jade-bg: #e7f2ea; --sky-bg: #eaeefa; --warm-bg: #fff2d6; --hill: #79ad7f; --tape: rgba(255, 216, 119, .8); overflow-x: clip; }
+.dx-wrap { width: min(1080px, 100% - 32px); margin: 0 auto; }
+
+/* 첫 화면: 남색 하늘 그림 + 포스터 */
+.dx-hero { position: relative; background: var(--ind); color: var(--cream); overflow: hidden; }
+.dx-sky { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 30%; }
+.dx-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(36, 45, 92, .88) 0%, rgba(36, 45, 92, .6) 46%, rgba(36, 45, 92, 0) 78%); }
+.dx-hero-in { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: clamp(28px, 5vw, 64px); align-items: center; padding: clamp(40px, 6vw, 72px) 0 clamp(96px, 11vw, 140px); }
+.dx-copy { display: grid; gap: 16px; min-width: 0; }
+.dx-copy .crumbs, .dx-copy .crumbs a { color: rgba(255, 246, 227, .8); }
+.dx-genre { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.dx-genre span { font-size: 14px; font-weight: 700; padding: 6px 14px; border-radius: 999px; background: rgba(255, 246, 227, .14); border: 1px solid rgba(255, 246, 227, .35); }
+.dx-title { font-family: var(--display); font-weight: 400; font-size: clamp(52px, 8vw, 100px); line-height: 1; letter-spacing: -.02em; margin: 0; color: var(--cream); text-shadow: 0 6px 0 rgba(0, 0, 0, .2); text-wrap: balance; }
+.dx-tag { font-size: clamp(18px, 2.2vw, 22px); line-height: 1.55; margin: 0; max-width: 34ch; }
+.dx-facts { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.dx-facts li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: rgba(15, 20, 48, .42); border: 1px solid rgba(255, 246, 227, .2); }
+.dx-facts i { font-size: 26px; color: var(--sun); flex: none; }
+.dx-facts span { display: grid; gap: 2px; font-weight: 700; font-size: 16px; line-height: 1.35; }
+.dx-facts small { font-size: 12.5px; font-weight: 600; color: rgba(255, 246, 227, .78); }
+.dx-hero .row-cta { margin-top: 6px; }
+.dx-hero .btn-ghost { color: var(--cream); border-color: rgba(255, 246, 227, .7); }
+.dx-poster { margin: 0; display: grid; gap: 12px; justify-items: center; }
+.dx-poster button { all: unset; display: block; width: 100%; cursor: zoom-in; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 60px -22px rgba(0, 0, 0, .65); transform: rotate(2deg); transition: transform .3s var(--ease-out); }
+.dx-poster button:hover { transform: rotate(0) scale(1.01); }
+.dx-poster button:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+.dx-poster img { display: block; width: 100%; height: auto; }
+.dx-poster figcaption { font-size: 13.5px; color: rgba(255, 246, 227, .85); }
+.dx-hills { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(46px, 7vw, 96px); }
+.dx-hills .a { fill: var(--hill); }
+.dx-hills .b { fill: var(--bg); }
+
+/* 차례 */
+.dx-tabs { background: var(--bg); padding-top: 6px; }
+.dx-tabs .dx-wrap { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.dx-tabs a:first-child { margin-left: auto; }
+.dx-tabs a:last-child { margin-right: auto; }
+.dx-tabs a { flex: none; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 15px; padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
+.dx-tabs a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 칸과 제목 */
+.dx-sec { padding: clamp(56px, 8vw, 96px) 0; scroll-margin-top: 72px; }
+.dx-jade { background: var(--jade-bg); }
+.dx-sky2 { background: var(--sky-bg); }
+.dx-warm { background: var(--warm-bg); }
+.dx-cream { background: var(--surface); }
+.dx-head { text-align: center; display: grid; justify-items: center; gap: 8px; margin-bottom: clamp(28px, 4vw, 44px); }
+.dx-kick { display: flex; align-items: center; gap: 10px; margin: 0; font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--accent); }
+.dx-cl { width: 42px; height: 21px; fill: #fff; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dx-cl.r { transform: scaleX(-1); }
+.dx-head h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.6vw, 46px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.dx-sub { margin: 0; color: var(--ink-soft); font-size: 17px; }
+
+/* 폴라로이드 사진 */
+.dx-pol { margin: 0; display: block; position: relative; box-sizing: border-box; width: 100%; background: #fff; padding: 10px 10px 12px; border-radius: 4px; box-shadow: 0 14px 30px -16px rgba(60, 40, 20, .5); transform: rotate(var(--tilt, -2deg)); transition: transform .3s var(--ease-out); }
+.dx-pol::before { content: ''; position: absolute; top: -10px; left: 50%; width: 72px; height: 22px; margin-left: -36px; background: var(--tape); transform: rotate(-3deg); }
+.dx-pol img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.dx-pol figcaption, .dx-pol > span { display: block; margin-top: 8px; font-size: 13.5px; line-height: 1.45; color: var(--ink-soft); text-align: center; }
+
+/* 작품 소개 */
+.dx-about { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 52px); align-items: center; }
+.dx-art { margin: 0; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); }
+.dx-art img { display: block; width: 100%; height: auto; }
+.dx-about-txt { display: grid; gap: 16px; font-size: 18px; line-height: 1.85; min-width: 0; }
+.dx-about-txt p { margin: 0; max-width: 40ch; }
+.dx-about-txt p:first-child { font-size: 20px; font-weight: 700; line-height: 1.7; }
+
+/* 관람 포인트 */
+.dx-points { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(22px, 3vw, 36px); }
+.dx-points li { display: grid; gap: 14px; justify-items: center; align-content: start; text-align: center; }
+.dx-points li:nth-child(2) .dx-pol { --tilt: 1.5deg; }
+.dx-points li:nth-child(3) .dx-pol { --tilt: -1deg; }
+.dx-badge { font-family: var(--display); font-size: 22px; color: #fff; background: var(--accent); padding: 4px 18px 6px; border-radius: 999px; }
+.dx-points h3 { font-size: 21px; margin: 6px 0 0; }
+.dx-points p { margin: 0; color: var(--ink-soft); font-size: 16px; line-height: 1.65; max-width: 30ch; }
+
+/* 등장인물 */
+.dx-chars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 26px); }
+.dx-chars li { display: grid; gap: 12px; justify-items: center; align-content: start; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 20px 16px 24px; }
+.dx-ch-ph { width: 100%; max-width: 200px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 5px solid var(--sun); background: var(--tint); }
+.dx-chars li:nth-child(2) .dx-ch-ph { border-color: #f2a65a; }
+.dx-chars li:nth-child(3) .dx-ch-ph { border-color: var(--hill); }
+.dx-chars li:nth-child(4) .dx-ch-ph { border-color: #8fa3dc; }
+.dx-ch-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dx-name { position: relative; margin-top: -28px; font-family: var(--display); font-weight: 400; font-size: 23px; padding: 2px 16px 4px; border-radius: 999px; background: var(--tint); border: 3px solid var(--surface); }
+.dx-chars p { margin: 0; color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; }
+
+/* 줄거리 */
+.dx-story { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(40px, 5vw, 60px); }
+.dx-step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 52px); align-items: center; }
+.dx-step:nth-child(even) .dx-pol { order: 2; --tilt: 2deg; }
+.dx-step > div { display: grid; gap: 10px; justify-items: start; min-width: 0; }
+.dx-num { width: 48px; height: 48px; border-radius: 50%; background: var(--ind); color: var(--cream); display: grid; place-items: center; font-family: var(--display); font-size: 24px; }
+.dx-step h3 { font-size: clamp(21px, 2.4vw, 26px); margin: 0; }
+.dx-step p { margin: 0; font-size: 17px; line-height: 1.85; }
+.dx-more { margin-top: clamp(36px, 5vw, 60px); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+.dx-more img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 4px solid var(--surface); box-shadow: var(--shadow); }
+.dx-more p { margin: 0; font-family: var(--display); font-size: clamp(22px, 3vw, 30px); color: var(--ind); }
+
+/* 아이들과 나누는 이야기 */
+.dx-talk { list-style: none; margin: 0 auto; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dx-talk li { display: grid; justify-items: center; gap: 14px; text-align: center; background: var(--surface); border-radius: 22px; padding: 28px 18px; font-weight: 700; font-size: 18px; line-height: 1.5; }
+.dx-talk i { width: 76px; height: 76px; border-radius: 50%; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-size: 40px; }
+.dx-theme { text-align: center; margin: 30px 0 0; font-size: 18px; }
+.dx-theme b { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 3vw, 30px); color: var(--accent); margin-left: 8px; }
+
+/* 공연 사진 */
+.dx-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(26px, 3vw, 38px) clamp(16px, 2.5vw, 28px); padding-top: 10px; }
+.dx-gallery button { all: unset; display: block; cursor: zoom-in; min-width: 0; }
+.dx-gallery button:nth-child(3n+2) .dx-pol { --tilt: 1.5deg; }
+.dx-gallery button:nth-child(3n) .dx-pol { --tilt: -1deg; }
+.dx-gallery button:hover .dx-pol { transform: rotate(0) translateY(-4px); }
+.dx-gallery button:focus-visible .dx-pol { outline: 3px solid var(--accent); outline-offset: 4px; }
+
+/* 이런 무대에 잘 맞아요 */
+.dx-fits { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.dx-fits li { display: grid; gap: 8px; align-content: start; background: var(--surface); border-radius: 22px; padding: 24px 20px; }
+.dx-fits i { font-size: 36px; color: var(--leaf); }
+.dx-fits b { font-size: 19px; }
+.dx-fits span { color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; }
+
+/* 공연 안내 · 극단 소개 */
+.dx-info, .dx-troupe { display: grid; gap: 22px; max-width: 920px; margin: 0 auto; }
+.dx-files { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.dx-cta { padding: clamp(48px, 7vw, 80px) 0; }
+
+@media (max-width: 900px) {
+  .dx-chars, .dx-fits, .dx-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dx-hero::after { background: linear-gradient(180deg, rgba(36, 45, 92, 0) 0, rgba(36, 45, 92, .55) 300px, var(--ind) 470px); }
+  .dx-sky { height: 520px; bottom: auto; object-position: 66% 0; }
+  .dx-hero-in { grid-template-columns: 1fr; padding-top: 28px; }
+  .dx-poster { order: -1; width: min(78vw, 340px); justify-self: center; }
+}
+@media (max-width: 760px) {
+  .dx-about, .dx-step, .dx-points, .dx-talk { grid-template-columns: 1fr; }
+  .dx-step:nth-child(even) .dx-pol { order: 0; }
+  .dx-points .dx-pol, .dx-step .dx-pol { max-width: 440px; justify-self: center; }
+}
+@media (max-width: 520px) {
+  .dx-fits, .dx-facts { grid-template-columns: 1fr; }
+  .dx-chars { gap: 12px; }
+  .dx-chars li { padding: 16px 10px 18px; }
+  .dx-name { font-size: 20px; padding: 2px 12px 4px; }
+  .dx-chars p { font-size: 14.5px; }
+  .dx-gallery { gap: 22px 12px; }
+  .dx-theme b { display: block; margin: 4px 0 0; }
+}
+@media print {
+  .dx-tabs, .dx-hero .row-cta, .dx-sky, .dx-hills, .dx-hero::after { display: none !important; }
+  .dx-hero { background: none; color: var(--ink); }
+  .dx-title, .dx-copy .crumbs, .dx-copy .crumbs a, .dx-facts small, .dx-poster figcaption { color: var(--ink); text-shadow: none; }
+  .dx-sec { padding: 24px 0; }
+  .dx-step, .dx-chars li, .dx-points li, .dx-fits li { break-inside: avoid; }
+}
