@@ -5,7 +5,7 @@
 /* 첫 화면: 남색 하늘 그림 + 포스터 */
 .dx-hero { position: relative; background: var(--ind); color: var(--cream); overflow: hidden; }
 .dx-sky { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 30%; }
-.dx-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(36, 45, 92, .88) 0%, rgba(36, 45, 92, .6) 46%, rgba(36, 45, 92, 0) 78%); }
+.dx-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--ind) 92%, transparent) 0%, color-mix(in srgb, var(--ind) 68%, transparent) 48%, transparent 80%); }
 .dx-hero-in { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: clamp(28px, 5vw, 64px); align-items: center; padding: clamp(40px, 6vw, 72px) 0 clamp(96px, 11vw, 140px); }
 .dx-copy { display: grid; gap: 16px; min-width: 0; }
 .dx-copy .crumbs, .dx-copy .crumbs a { color: rgba(255, 246, 227, .8); }
@@ -25,7 +25,7 @@
 .dx-poster button:hover { transform: rotate(0) scale(1.01); }
 .dx-poster button:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
 .dx-poster img { display: block; width: 100%; height: auto; }
-.dx-poster figcaption { font-size: 13.5px; color: rgba(255, 246, 227, .85); }
+.dx-poster figcaption { font-size: 13.5px; color: var(--cream); background: color-mix(in srgb, var(--ind) 78%, transparent); padding: 4px 14px; border-radius: 999px; }
 .dx-hills { position: absolute; left: 0; bottom: -1px; z-index: 1; width: 100%; height: clamp(46px, 7vw, 96px); }
 .dx-hills .a { fill: var(--hill); }
 .dx-hills .b { fill: var(--bg); }
@@ -84,12 +84,16 @@
 .dx-ch-ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .dx-name { position: relative; margin-top: -28px; font-family: var(--display); font-weight: 400; font-size: 23px; padding: 2px 16px 4px; border-radius: 999px; background: var(--tint); border: 3px solid var(--surface); }
 .dx-chars p { margin: 0; color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; }
+.dx-chars[data-n="1"] { grid-template-columns: minmax(0, 340px); justify-content: center; }
+.dx-chars[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 620px; margin: 0 auto; }
+.dx-chars[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 880px; margin: 0 auto; }
 
 /* 줄거리 */
 .dx-story { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(40px, 5vw, 60px); }
 .dx-step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 52px); align-items: center; }
 .dx-step:nth-child(even) .dx-pol { order: 2; --tilt: 2deg; }
 .dx-step > div { display: grid; gap: 10px; justify-items: start; min-width: 0; }
+.dx-step-text { grid-template-columns: minmax(0, 1fr); max-width: 760px; width: 100%; margin: 0 auto; background: var(--surface); border-radius: 22px; padding: clamp(22px, 3vw, 32px); box-sizing: border-box; }
 .dx-num { width: 48px; height: 48px; border-radius: 50%; background: var(--ind); color: var(--cream); display: grid; place-items: center; font-family: var(--display); font-size: 24px; }
 .dx-step h3 { font-size: clamp(21px, 2.4vw, 26px); margin: 0; }
 .dx-step p { margin: 0; font-size: 17px; line-height: 1.85; }
@@ -106,6 +110,8 @@
 
 /* 공연 사진 */
 .dx-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(26px, 3vw, 38px) clamp(16px, 2.5vw, 28px); padding-top: 10px; }
+.dx-gallery[data-n="1"] { grid-template-columns: minmax(0, 360px); justify-content: center; }
+.dx-gallery[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; }
 .dx-gallery button { all: unset; display: block; cursor: zoom-in; min-width: 0; }
 .dx-gallery button:nth-child(3n+2) .dx-pol { --tilt: 1.5deg; }
 .dx-gallery button:nth-child(3n) .dx-pol { --tilt: -1deg; }
@@ -125,8 +131,9 @@
 .dx-cta { padding: clamp(48px, 7vw, 80px) 0; }
 
 @media (max-width: 900px) {
-  .dx-chars, .dx-fits, .dx-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dx-hero::after { background: linear-gradient(180deg, rgba(36, 45, 92, 0) 0, rgba(36, 45, 92, .55) 300px, var(--ind) 470px); }
+  .dx-chars, .dx-chars[data-n="3"], .dx-fits, .dx-gallery, .dx-gallery[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dx-gallery[data-n="1"] { grid-template-columns: minmax(0, 300px); }
+  .dx-hero::after { background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--ind) 60%, transparent) 300px, var(--ind) 470px); }
   .dx-sky { height: 520px; bottom: auto; object-position: 66% 0; }
   .dx-hero-in { grid-template-columns: 1fr; padding-top: 28px; }
   .dx-poster { order: -1; width: min(78vw, 340px); justify-self: center; }
