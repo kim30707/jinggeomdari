@@ -42,7 +42,8 @@ var JG = (function () {
     questions: { sheet: '문의 질문', cols: [['id', '번호'], ['order', '순서'], ['label', '질문'], ['type', '유형'], ['options', '선택지(줄마다 하나)'], ['required', '필수'], ['help', '도움말'], ['active', '사용']] },
     settings: { sheet: '설정', cols: [['key', '항목'], ['label', '설명'], ['value', '값']] },
     works: { sheet: '작품', cols: [['id', '번호'], ['order', '순서'], ['title', '제목'], ['badge', '표시(예: 2026 신작)'], ['sub', '부제'], ['genre', '장르(쉼표로 나눔)'], ['time', '공연 시간'], ['line', '한 줄 소개'], ['story', '줄거리(빈 줄로 문단 나눔)'], ['points', '아이들과 나누는 이야기(줄마다)'], ['theme', '주제'], ['note', '덧붙이는 말'], ['art', '사진 없을 때 색'], ['featured', '크게 보이기'], ['active', '공개'], ['updatedAt', '고친 날']] },
-    photos: { sheet: '사진', cols: [['id', '번호'], ['workId', '작품 번호'], ['order', '순서'], ['caption', '사진 설명'], ['src', '사진 위치(고치지 마세요)'], ['home', '홈 사진 모음'], ['createdAt', '등록일시']] }
+    photos: { sheet: '사진', cols: [['id', '번호'], ['workId', '작품 번호'], ['order', '순서'], ['caption', '사진 설명'], ['src', '사진 위치(고치지 마세요)'], ['home', '홈 사진 모음'], ['createdAt', '등록일시']] },
+    feedback: { sheet: '시안 의견', cols: [['id', '번호'], ['createdAt', '접수일시'], ['topic', '무엇에 대한 의견'], ['choice', '고른 시안'], ['message', '수정 요청·의견'], ['name', '보낸 사람']] }
   };
   var MAX_PHOTOS = 30, MAX_WORKS = 30;
 
@@ -247,6 +248,7 @@ var JG = (function () {
       if (a === 'public') return publicData(env);
       if (a === 'content') return contentData(env);
       if (a === 'inquire') return inquire(req, env);
+      if (a === 'feedback') return feedback(req, env);
       if (a === 'login') return login(req, env);
       if (!auth(req, env)) return fail('auth', '다시 로그인해 주세요.');
       switch (a) {
@@ -594,6 +596,29 @@ var JG = (function () {
     env.lock(function () { env.store.append('photos', fromPhoto(p)); });
     dirtyContent(env);
     return { ok: true, photo: p };
+  }
+
+  /* 시안 의견: 무대 배경 같은 시안 확인 페이지에서 고른 시안과 수정 요청을 '시안 의견' 탭에 쌓고 메일로 알림 */
+  function feedback(req, env) {
+    if (str(req.website)) return { ok: true, id: 'OK' };
+    var count = +(env.cache.get('fb-hour') || 0);
+    if (count >= 30) return fail('busy', '의견이 몰려 잠시 받을 수 없어요. 잠시 후 다시 보내 주세요.');
+    var topic = clean(req.topic, 80), choice = clean(req.choice, 80), message = clean(req.message, 2000), name = clean(req.name, 40);
+    if (!topic) return fail('invalid', '어떤 시안에 대한 의견인지 알 수 없어요. 페이지를 새로 고쳐 주세요.');
+    if (!choice && !message) return fail('invalid', '시안을 고르거나 수정 요청을 적어 주세요.');
+    var id = 'F' + env.today().replace(/-/g, '').slice(2) + '-' + env.uuid().slice(0, 4).toUpperCase();
+    var rec = { id: id, createdAt: env.now(), topic: topic, choice: choice, message: message, name: name };
+    env.lock(function () { env.store.append('feedback', rec); });
+    env.cache.put('fb-hour', String(count + 1), 3600);
+    var s = readSettings(env);
+    if (s.notifyEmail && env.mail) {
+      try {
+        env.mail(s.notifyEmail, '[아동극단 징검다리] 시안 의견 · ' + topic + (choice ? ' · ' + choice : ''),
+          '시안 확인 페이지에서 의견이 왔어요.\n\n무엇: ' + topic + '\n고른 시안: ' + (choice || '(고르지 않음)') + '\n보낸 사람: ' + (name || '(적지 않음)') +
+          '\n\n수정 요청·의견:\n' + (message || '(없음)') + '\n\n접수 번호: ' + id + '\n구글 시트의 "시안 의견" 탭에도 저장되었습니다.');
+      } catch (e) {}
+    }
+    return { ok: true, id: id };
   }
 
   /* 처음 한 번: 시트와 기본값 만들기 (이미 있는 내용은 지우지 않습니다) */
