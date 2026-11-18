@@ -242,3 +242,8 @@
   .hm-play-line { font-size: 14px; }
   .dtx .section-head h2::before, .dtx .section-head h2::after { width: 30px; height: 15px; }
 }
+/* 공연 영상 (2026-11-18) */
+.dx-video { margin: clamp(28px, 4vw, 44px) auto 0; max-width: 860px; }
+.dx-video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+.dx-video figcaption { margin-top: 10px; text-align: center; font-size: .95rem; opacity: .8; }
+#video .dx-video { margin-top: 10px; }
