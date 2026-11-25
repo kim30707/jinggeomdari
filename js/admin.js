@@ -584,7 +584,7 @@
     var form = el('form', { class: 'set-form' });
     var accept = el('input', { type: 'checkbox', id: 'set-accept', checked: vals.acceptInquiries === '예' });
     form.appendChild(el('div', { class: 'fld', 'data-key': 'acceptInquiries' }, [el('label', { class: 'switch big', for: 'set-accept' }, [accept, '홈페이지에서 온라인 문의 받기']), el('p', { class: 'help', text: help.acceptInquiries })]));
-    var email = inp({ type: 'email', id: 'set-email', placeholder: 'name@example.com' }, vals.notifyEmail);
+    var email = inp({ type: 'text', inputmode: 'email', autocomplete: 'off', spellcheck: 'false', id: 'set-email', placeholder: 'name@example.com, other@example.com' }, vals.notifyEmail);
     form.appendChild(field('알림 받을 이메일', email, help.notifyEmail, 'notifyEmail'));
     var nums = el('div', { class: 'set-nums' });
     var maxDay = inp({ type: 'number', id: 'set-max', min: 1, max: 5 }, vals.maxPerDay);

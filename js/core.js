@@ -13,7 +13,7 @@ var JG = (function () {
 
   var SETTINGS = [
     ['acceptInquiries', '문의 받기', '예', '끄면(시트에서는 아니오) 홈페이지 달력에서 온라인 문의를 받지 않습니다'],
-    ['notifyEmail', '알림 받을 이메일', '', '새 문의가 오면 이 주소로 메일을 보냅니다'],
+    ['notifyEmail', '알림 받을 이메일', '', '새 문의가 오면 이 주소로 메일을 보냅니다. 여러 사람에게 보내려면 쉼표(,)로 구분합니다'],
     ['maxPerDay', '하루 최대 공연 수', '1', '이 수만큼 공연이 잡힌 날은 문의를 받지 않습니다'],
     ['openWeekdays', '문의 받는 요일', '월,화,수,목,금,토', '쉼표로 구분합니다'],
     ['minLeadDays', '최소 준비 기간(일)', '7', '오늘부터 며칠 뒤 날짜부터 문의를 받습니다'],
@@ -49,6 +49,10 @@ var JG = (function () {
 
   /* ---------- 작은 도구 ---------- */
   function str(v) { return v == null ? '' : String(v); }
+  function emailList(v) {
+    var seen = {};
+    return str(v).split(/[,;\s]+/).filter(function (x) { if (!x || seen[x.toLowerCase()]) return false; seen[x.toLowerCase()] = 1; return true; });
+  }
   function clean(v, max) {
     var s = str(v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').replace(/\r\n?/g, '\n').trim();
     return max ? s.slice(0, max) : s;
@@ -149,7 +153,7 @@ var JG = (function () {
     var days = str(s.openWeekdays).split(/[,\s·]+/).map(function (x) { return x.replace('요일', '').trim(); }).filter(function (x) { return WEEK.indexOf(x) >= 0; });
     return {
       acceptInquiries: s.acceptInquiries === true || yes(s.acceptInquiries),
-      notifyEmail: clean(s.notifyEmail, 120),
+      notifyEmail: emailList(clean(s.notifyEmail, 300)).join(', '),
       maxPerDay: num(s.maxPerDay, 1, 5, 1),
       openWeekdays: days,
       minLeadDays: num(s.minLeadDays, 0, 90, 7),
@@ -488,7 +492,11 @@ var JG = (function () {
       if (d[0] === 'acceptInquiries') v = yn(v === true || yes(v));
       else if (d[0] === 'openWeekdays') v = (Array.isArray(v) ? v : str(v).split(/[,\s]+/)).filter(function (x) { return WEEK.indexOf(x) >= 0; }).join(',');
       else v = clean(v, d[0] === 'privacyNotice' ? 600 : 300);
-      if (d[0] === 'notifyEmail' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) errors.notifyEmail = '이메일 주소를 확인해 주세요';
+      if (d[0] === 'notifyEmail' && v) {
+        var list = emailList(v);
+        if (list.length > 5 || list.some(function (x) { return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x); })) errors.notifyEmail = '이메일 주소를 확인해 주세요 (여러 개는 쉼표로 구분, 5개까지)';
+        else v = list.join(', ');
+      }
       if ((d[0] === 'maxPerDay' || d[0] === 'minLeadDays' || d[0] === 'maxMonths') && !/^\d{1,3}$/.test(v)) errors[d[0]] = '숫자로 적어 주세요';
       return { key: d[0], label: d[1], value: v };
     });
